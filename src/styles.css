@@ -1,0 +1,184 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --color-arena-dark: var(--arena-dark);
+  --color-arena-panel: var(--arena-panel);
+  --color-arena-gold: var(--arena-gold);
+  --color-arena-gold-deep: var(--arena-gold-deep);
+  --color-arena-crimson: var(--arena-crimson);
+  --color-arena-cyan: var(--arena-cyan);
+  --color-arena-blue: var(--arena-blue);
+  --color-arena-green: var(--arena-green);
+  --font-display: "Orbitron", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Rajdhani", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.75rem;
+  --arena-dark: oklch(0.13 0.02 265);
+  --arena-panel: oklch(0.18 0.025 265);
+  --arena-gold: oklch(0.82 0.16 84);
+  --arena-gold-deep: oklch(0.74 0.15 78);
+  --arena-crimson: oklch(0.62 0.24 15);
+  --arena-cyan: oklch(0.8 0.14 210);
+  --arena-blue: oklch(0.62 0.2 250);
+  --arena-green: oklch(0.79 0.2 155);
+
+  --background: var(--arena-dark);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.17 0.022 265);
+  --card-foreground: oklch(0.97 0.005 250);
+  --popover: oklch(0.17 0.022 265);
+  --popover-foreground: oklch(0.97 0.005 250);
+  --primary: var(--arena-gold);
+  --primary-foreground: var(--arena-dark);
+  --secondary: oklch(0.24 0.03 265);
+  --secondary-foreground: oklch(0.97 0.005 250);
+  --muted: oklch(0.22 0.025 265);
+  --muted-foreground: oklch(0.68 0.02 255);
+  --accent: oklch(0.26 0.035 265);
+  --accent-foreground: var(--arena-gold);
+  --destructive: var(--arena-crimson);
+  --destructive-foreground: oklch(0.98 0.003 250);
+  --border: oklch(0.82 0.16 84 / 15%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: var(--arena-gold);
+  --chart-1: var(--arena-gold);
+  --chart-2: var(--arena-cyan);
+  --chart-3: var(--arena-green);
+  --chart-4: var(--arena-crimson);
+  --chart-5: var(--arena-blue);
+  --sidebar: oklch(0.17 0.022 265);
+  --sidebar-foreground: oklch(0.97 0.005 250);
+  --sidebar-primary: var(--arena-gold);
+  --sidebar-primary-foreground: var(--arena-dark);
+  --sidebar-accent: oklch(0.24 0.03 265);
+  --sidebar-accent-foreground: var(--arena-gold);
+  --sidebar-border: oklch(0.82 0.16 84 / 15%);
+  --sidebar-ring: var(--arena-gold);
+
+  --gradient-gold: linear-gradient(135deg, var(--arena-gold), var(--arena-gold-deep));
+  --glass-bg: color-mix(in oklab, var(--arena-panel) 80%, transparent);
+  --shadow-gold: 0 0 32px -8px color-mix(in oklab, var(--arena-gold) 55%, transparent);
+  --shadow-cyan: 0 0 32px -8px color-mix(in oklab, var(--arena-cyan) 60%, transparent);
+  --shadow-green: 0 0 32px -8px color-mix(in oklab, var(--arena-green) 60%, transparent);
+  --shadow-crimson: 0 0 32px -8px color-mix(in oklab, var(--arena-crimson) 60%, transparent);
+}
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(
+        60rem 40rem at 15% -10%,
+        color-mix(in oklab, var(--arena-blue) 16%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        50rem 35rem at 95% 5%,
+        color-mix(in oklab, var(--arena-gold) 12%, transparent),
+        transparent
+      );
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+  }
+}
+
+@utility glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in oklab, var(--arena-gold) 15%, transparent);
+  border-radius: var(--radius-2xl);
+}
+
+@utility gold-gradient {
+  background-image: var(--gradient-gold);
+}
+
+@utility text-gold-gradient {
+  background-image: var(--gradient-gold);
+  background-clip: text;
+  color: transparent;
+}
+
+@utility tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
