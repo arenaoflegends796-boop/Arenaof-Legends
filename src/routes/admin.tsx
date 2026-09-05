@@ -200,15 +200,15 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleAddWalkin = (e: React.FormEvent) => {
     e.preventDefault();
     const hourlyRate = zonesData[walkinZone]?.rate || 300;
-    const total = Math.round((hourlyRate / 60) * walkinMins * 2);
+    const total = Math.round((hourlyRate / 60) * walkinMins * 1);
     addBooking({
       customerName: walkinName || "Walk-in Customer",
       phone: walkinPhone || "+91 90000 00000",
-      bookingDate: new Date().toISOString().split("T")[0],
+      bookingDate: new Date().toISOString().split("T")[0] ?? "2026-09-02",
       slot: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       zoneIds: [walkinZone],
       minutes: walkinMins,
-      players: 2,
+      players: 1,
       total,
       preferredFormat: "Quick Walk-in Session",
     });
@@ -221,7 +221,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     e.preventDefault();
     if (!editingBooking) return;
     const zoneRate = editingBooking.zoneIds.reduce((sum, z) => sum + (zonesData[z]?.rate || 0), 0);
-    const newTotal = Math.round((zoneRate / 60) * rescheduleMins * (editingBooking.players || 1));
+    const newTotal = Math.round((zoneRate / 60) * rescheduleMins);
 
     updateBooking(editingBooking.id, {
       bookingDate: rescheduleDate,
@@ -235,7 +235,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleAddBlock = (e: React.FormEvent) => {
     e.preventDefault();
     addBlockedSlot({
-      date: blockDate,
+      date: blockDate || (new Date().toISOString().split("T")[0] ?? "2026-09-02"),
       startTime: blockStartTime,
       endTime: blockEndTime,
       zoneId: blockZone,

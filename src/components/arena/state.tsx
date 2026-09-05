@@ -71,8 +71,8 @@ const DEFAULT_SETTINGS: ArenaSettings = {
   surgeMultiplier: 1.2,
   surgeEnabled: false,
   arenaName: "Arena of Legends",
-  contactPhone: "+919876543210",
-  whatsappUrl: "https://wa.me/919876543210",
+  contactPhone: "+917483992257",
+  whatsappUrl: "https://wa.me/917483992257",
   openingHours: "10:00 AM - 11:30 PM",
   slotIntervalMinutes: 30,
   bufferMinutes: 10,
@@ -163,7 +163,7 @@ type ArenaState = {
   zonesData: Record<ZoneId, ZoneInfo>;
   updateZoneRate: (id: ZoneId, rate: number) => void;
   toggleZoneActive: (id: ZoneId) => void;
-  
+
   // Public calculator state
   zones: ZoneId[];
   toggleZone: (z: ZoneId) => void;
@@ -173,14 +173,14 @@ type ArenaState = {
   players: number;
   setPlayers: (n: number) => void;
   total: number;
-  
+
   // Admin & Bookings
   bookings: BookingItem[];
   addBooking: (b: Omit<BookingItem, "id" | "createdAt" | "status">) => BookingItem;
   updateBooking: (id: string, updated: Partial<BookingItem>) => void;
   updateBookingStatus: (id: string, status: BookingItem["status"]) => void;
   deleteBooking: (id: string) => void;
-  
+
   // Blocked Slots & Maintenance
   blockedSlots: BlockedSlot[];
   addBlockedSlot: (b: Omit<BlockedSlot, "id">) => void;
@@ -189,7 +189,7 @@ type ArenaState = {
   // Station Management
   stations: StationItem[];
   updateStationStatus: (id: string, status: StationItem["status"], customerName?: string) => void;
-  
+
   // Settings & PIN
   settings: ArenaSettings;
   updateSettings: (newSettings: Partial<ArenaSettings>) => void;
@@ -299,12 +299,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   // Public Booking Calculator State
   const [zones, setZones] = useState<ZoneId[]>(["ps5"]);
   const [minutes, setMinutes] = useState(120);
-  const [players, setPlayers] = useState(2);
+  const [players, setPlayers] = useState(1);
 
   const value = useMemo<ArenaState>(() => {
     const hourlySum = zones.reduce((sum, z) => sum + (zonesData[z]?.rate || 0), 0);
     const multiplier = settings.surgeEnabled ? settings.surgeMultiplier : 1;
-    const total = Math.round(((hourlySum / 60) * minutes * players) * multiplier);
+    const total = Math.round(((hourlySum / 60) * minutes) * multiplier);
 
     return {
       zonesData,
@@ -325,7 +325,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       minutes,
       players,
       total,
-      setMinutes: (n) => setMinutes(Math.min(360, Math.max(15, n))),
+      setMinutes: (n) => setMinutes(Math.min(720, Math.max(1, n))),
       setPlayers: (n) => setPlayers(Math.min(20, Math.max(1, n))),
       toggleZone: (z) =>
         setZones((cur) =>
@@ -373,17 +373,20 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       stations,
       updateStationStatus: (id, status, customerName) => {
         setStations((prev) =>
-          prev.map((s) =>
-            s.id === id
-              ? {
-                  ...s,
-                  status,
-                  assignedCustomer: status === "in_use" ? customerName || "Walk-in Customer" : undefined,
-                  startTime: status === "in_use" ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
-                  currentSessionMinutes: status === "in_use" ? 0 : undefined,
-                }
-              : s
-          )
+          prev.map((s) => {
+            if (s.id !== id) return s;
+            if (status === "in_use") {
+              return {
+                ...s,
+                status,
+                assignedCustomer: customerName || "Walk-in Customer",
+                startTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                currentSessionMinutes: 0,
+              };
+            }
+            const { assignedCustomer, startTime, currentSessionMinutes, ...rest } = s;
+            return { ...rest, status };
+          })
         );
       },
 
@@ -429,5 +432,5 @@ export function formatDuration(mins: number) {
   return `${m} min`;
 }
 
-export const PHONE = "+919876543210";
-export const WHATSAPP = "https://wa.me/919876543210";
+export const PHONE = "+917483992257";
+export const WHATSAPP = "https://wa.me/917483992257";

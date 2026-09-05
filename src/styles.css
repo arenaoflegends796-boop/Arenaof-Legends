@@ -74,55 +74,43 @@
 
 :root {
   --radius: 0.75rem;
-  --arena-dark: oklch(0.13 0.02 265);
-  --arena-panel: oklch(0.18 0.025 265);
-  --arena-gold: oklch(0.82 0.16 84);
-  --arena-gold-deep: oklch(0.74 0.15 78);
-  --arena-crimson: oklch(0.62 0.24 15);
-  --arena-cyan: oklch(0.8 0.14 210);
-  --arena-blue: oklch(0.62 0.2 250);
-  --arena-green: oklch(0.79 0.2 155);
+  --arena-dark: #0a0a0a;
+  --arena-panel: #121212;
+  --arena-gold: #FFD700;
+  --arena-gold-deep: #FFC107;
+  --arena-crimson: #FF003C;
+  --arena-cyan: #00E5FF;
+  --arena-blue: #00E5FF;
+  --arena-green: #39FF14;
 
   --background: var(--arena-dark);
-  --foreground: oklch(0.97 0.005 250);
-  --card: oklch(0.17 0.022 265);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.17 0.022 265);
-  --popover-foreground: oklch(0.97 0.005 250);
+  --foreground: #F5F5F5;
+  --card: #121212;
+  --card-foreground: #FFFFFF;
+  --popover: #121212;
+  --popover-foreground: #FFFFFF;
   --primary: var(--arena-gold);
   --primary-foreground: var(--arena-dark);
-  --secondary: oklch(0.24 0.03 265);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.22 0.025 265);
-  --muted-foreground: oklch(0.68 0.02 255);
-  --accent: oklch(0.26 0.035 265);
+  --secondary: #1E1E1E;
+  --secondary-foreground: #FFFFFF;
+  --muted: #1E1E1E;
+  --muted-foreground: #A0A0A0;
+  --accent: #242424;
   --accent-foreground: var(--arena-gold);
   --destructive: var(--arena-crimson);
-  --destructive-foreground: oklch(0.98 0.003 250);
-  --border: oklch(0.82 0.16 84 / 15%);
-  --input: oklch(1 0 0 / 12%);
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(255, 215, 0, 0.2);
+  --input: rgba(255, 255, 255, 0.12);
   --ring: var(--arena-gold);
-  --chart-1: var(--arena-gold);
-  --chart-2: var(--arena-cyan);
-  --chart-3: var(--arena-green);
-  --chart-4: var(--arena-crimson);
-  --chart-5: var(--arena-blue);
-  --sidebar: oklch(0.17 0.022 265);
-  --sidebar-foreground: oklch(0.97 0.005 250);
-  --sidebar-primary: var(--arena-gold);
-  --sidebar-primary-foreground: var(--arena-dark);
-  --sidebar-accent: oklch(0.24 0.03 265);
-  --sidebar-accent-foreground: var(--arena-gold);
-  --sidebar-border: oklch(0.82 0.16 84 / 15%);
-  --sidebar-ring: var(--arena-gold);
 
-  --gradient-gold: linear-gradient(135deg, var(--arena-gold), var(--arena-gold-deep));
-  --glass-bg: color-mix(in oklab, var(--arena-panel) 80%, transparent);
-  --shadow-gold: 0 0 32px -8px color-mix(in oklab, var(--arena-gold) 55%, transparent);
-  --shadow-cyan: 0 0 32px -8px color-mix(in oklab, var(--arena-cyan) 60%, transparent);
-  --shadow-green: 0 0 32px -8px color-mix(in oklab, var(--arena-green) 60%, transparent);
-  --shadow-crimson: 0 0 32px -8px color-mix(in oklab, var(--arena-crimson) 60%, transparent);
+  --gradient-gold: linear-gradient(135deg, #FFD700, #FFC107);
+  --glass-bg: rgba(18, 18, 18, 0.85);
+  --shadow-gold: 0 0 25px rgba(255, 215, 0, 0.45);
+  --shadow-cyan: 0 0 25px rgba(0, 229, 255, 0.5);
+  --shadow-green: 0 0 25px rgba(57, 255, 20, 0.5);
+  --shadow-crimson: 0 0 25px rgba(255, 0, 60, 0.5);
 }
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -134,18 +122,18 @@
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--arena-dark);
+    color: var(--foreground);
     font-family: var(--font-sans);
     background-image:
       radial-gradient(
         60rem 40rem at 15% -10%,
-        color-mix(in oklab, var(--arena-blue) 16%, transparent),
+        rgba(0, 229, 255, 0.08),
         transparent
       ),
       radial-gradient(
         50rem 35rem at 95% 5%,
-        color-mix(in oklab, var(--arena-gold) 12%, transparent),
+        rgba(255, 215, 0, 0.06),
         transparent
       );
     background-attachment: fixed;
@@ -163,7 +151,7 @@
 @utility glass-panel {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid color-mix(in oklab, var(--arena-gold) 15%, transparent);
+  border: 1px solid rgba(255, 215, 0, 0.18);
   border-radius: var(--radius-2xl);
 }
 
@@ -181,4 +169,65 @@
   min-height: 44px;
   min-width: 44px;
 }
+
+/* Button Tactile Scale & Glowing Box Shadows */
+.btn-cta-gold {
+  background: var(--gradient-gold);
+  color: #0a0a0a;
+  font-weight: 800;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+.btn-cta-gold:hover {
+  transform: scale(1.04);
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-cta-ps5 {
+  background: linear-gradient(135deg, #00E5FF, #0088FF);
+  color: #0a0a0a;
+  font-weight: 800;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+.btn-cta-ps5:hover {
+  transform: scale(1.04);
+  box-shadow: var(--shadow-cyan);
+}
+
+.btn-cta-snooker {
+  background: linear-gradient(135deg, #FF003C, #D00030);
+  color: #ffffff;
+  font-weight: 800;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+.btn-cta-snooker:hover {
+  transform: scale(1.04);
+  box-shadow: var(--shadow-crimson);
+}
+
+/* WhatsApp Floating Pulse Animation */
+@keyframes whatsapp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); }
+  70% { box-shadow: 0 0 0 16px rgba(57, 255, 20, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
+}
+
+.whatsapp-fab {
+  animation: whatsapp-pulse 2s infinite;
+}
+
+/* Sticky Mobile CTA (Exclusively for max-width: 768px) */
+@media (max-width: 768px) {
+  .sticky-mobile-cta {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 215, 0, 0.25);
+    padding: 0.75rem 1rem;
+  }
+}
+
 

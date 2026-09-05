@@ -1,28 +1,34 @@
-import { Gamepad2, Target, Trophy, Zap } from "lucide-react";
-import { scrollToId } from "./state";
+import { Clock, Gamepad2, Target, Trophy, Zap } from "lucide-react";
+import { scrollToId, useArena } from "./state";
 
 const BADGES = [
-  { icon: "🎮", text: "2x PS5 VIP Stations (₹300/hr)", cls: "text-arena-cyan border-arena-cyan/40" },
+  { icon: "🎮", text: "2x PS5 VIP Stations", cls: "text-arena-cyan border-arena-cyan/40" },
   {
     icon: "🎱",
-    text: "2x English Snooker Boards (₹240/hr)",
+    text: "2x English Snooker Boards",
     cls: "text-arena-green border-arena-green/40",
   },
   {
     icon: "🥖",
-    text: "1x French Board (₹160/hr)",
+    text: "1x French Board",
     cls: "text-arena-crimson border-arena-crimson/40",
   },
-  { icon: "⏱️", text: "Per-Minute Billing Available", cls: "text-arena-gold border-arena-gold/40" },
 ];
 
 export function Hero() {
+  const { settings } = useArena();
+
   return (
     <section id="hero" className="relative overflow-hidden px-4 pb-16 pt-28 lg:px-8 lg:pt-36">
       <div className="mx-auto max-w-5xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-arena-gold/30 bg-accent/40 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-arena-gold">
-          Play • Compete • Win • Repeat
-        </span>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full border border-arena-gold/30 bg-accent/40 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-arena-gold">
+            Play • Compete • Win • Repeat
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-arena-green/40 bg-arena-green/10 px-4 py-1.5 text-xs font-extrabold text-arena-green">
+            <Clock className="h-3.5 w-3.5" /> Open: {settings.openingTime || "10:00 AM"} — Close: {settings.closingTime || "11:30 PM"}
+          </span>
+        </div>
 
         <h1 className="mt-6 font-display text-4xl font-black leading-[1.05] sm:text-6xl lg:text-7xl">
           <span className="text-gold-gradient">PLAY. COMPETE.</span>
@@ -31,8 +37,7 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-          Elite PlayStation 5 VIP setups, championship English Snooker, and French Billiards. Zero
-          lag, pro-grade equipment, pure competition.
+          Elite PlayStation 5 VIP setups, championship English Snooker, and French Billiards. Pro-grade equipment, pure competition.
         </p>
 
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
@@ -44,7 +49,7 @@ export function Hero() {
           </button>
         </div>
 
-        <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
             <li
               key={b.text}

@@ -108,10 +108,57 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Arena of Legends",
+    "description": "Premium PS5 gaming cafe & professional Snooker arena in Peenya, Bengaluru.",
+    "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Nelagadaranahalli Main Rd, Gopal Nagar, Nalagadderanahalli, Peenya",
+      "addressLocality": "Bengaluru",
+      "postalCode": "560073",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 12.9716,
+      "longitude": 77.5946
+    },
+    "url": "https://arenaoflegends.com",
+    "telephone": "+919876543210",
+    "priceRange": "₹160 - ₹300/hr",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"],
+        "opens": "11:00",
+        "closes": "00:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Friday", "Saturday", "Sunday"],
+        "opens": "10:00",
+        "closes": "02:00"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "128"
+    },
+    "category": ["Gaming Cafe", "Esports Lounge", "Snooker Club", "Billiards Hall"]
+  };
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body>
         {children}

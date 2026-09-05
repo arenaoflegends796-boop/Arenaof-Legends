@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Crown, Menu, Phone, Shield, X, Zap } from "lucide-react";
+import { Crown, Menu, Phone, Shield, User, X, Zap } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { PHONE, WHATSAPP, scrollToId } from "./state";
 
@@ -23,6 +23,10 @@ export function Navbar() {
 
   const go = (id: string) => {
     setOpen(false);
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      window.location.href = `/#${id}`;
+      return;
+    }
     scrollToId(id);
   };
 
@@ -56,10 +60,16 @@ export function Navbar() {
             </button>
           ))}
           <Link
-            to="/admin"
+            to="/dashboard"
             className="inline-flex items-center gap-1.5 rounded-xl border border-arena-gold/40 px-3 py-1.5 text-xs font-bold text-arena-gold transition-colors hover:bg-arena-gold/10 tap-target"
           >
-            <Shield className="h-3.5 w-3.5" /> Admin Panel
+            <User className="h-3.5 w-3.5" /> Player Portal
+          </Link>
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-arena-gold/20 px-3 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-accent tap-target"
+          >
+            <Shield className="h-3.5 w-3.5" /> Admin
           </Link>
           <a
             href={WHATSAPP}
