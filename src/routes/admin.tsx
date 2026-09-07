@@ -268,6 +268,14 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
 
           <div className="flex items-center gap-3">
+            <a
+              href="/billing.html"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-arena-green/40 bg-arena-green/10 px-3.5 py-2 text-xs font-bold text-arena-green hover:bg-arena-green hover:text-arena-dark transition-all"
+            >
+              <Zap className="h-4 w-4" /> Per-Min Billing App
+            </a>
             <Link
               to="/"
               className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-arena-gold/30 px-3.5 py-2 text-xs font-bold text-arena-gold hover:bg-arena-gold/10"
