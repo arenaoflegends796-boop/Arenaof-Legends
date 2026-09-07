@@ -131,13 +131,8 @@ export function ZonesMatrix() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <span className="text-4xl">{emoji}</span>
-                  <div className="text-right">
-                    <span className={`font-display text-2xl font-black ${meta.accent}`}>
-                      {INR(currentRate)}
-                    </span>
-                    <p className="text-xs font-bold text-muted-foreground">
-                      /hr · {INR(Math.round(currentRate / 60))}/min
-                    </p>
+                  <div className="rounded-full bg-arena-gold/10 px-3 py-1 text-xs font-bold text-arena-gold border border-arena-gold/30">
+                    Premium Setup
                   </div>
                 </div>
 

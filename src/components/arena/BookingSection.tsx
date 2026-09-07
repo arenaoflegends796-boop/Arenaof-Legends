@@ -308,9 +308,9 @@ export function BookingSection() {
                 <div className="rounded-xl border border-arena-gold/30 bg-accent/40 px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2">
                   <span className="font-bold text-arena-gold flex items-center gap-1.5">
                     <span>🕒 Venue Hours:</span>
-                    <span>Open Time: <strong>{settings.openingTime || "10:00 AM"}</strong></span>
+                    <span>Open Time: <strong>{settings.openingTime || "11:00 AM"}</strong></span>
                     <span>·</span>
-                    <span>Close Time: <strong>{settings.closingTime || "11:30 PM"}</strong></span>
+                    <span>Close Time: <strong>{settings.closingTime || "11:00 PM"}</strong></span>
                   </span>
                   <span className="text-[11px] text-muted-foreground">({settings.slotIntervalMinutes}m steps)</span>
                 </div>
@@ -322,7 +322,7 @@ export function BookingSection() {
                 <label className="text-sm font-semibold flex items-center justify-between" htmlFor="slot">
                   <span>Preferred time slot</span>
                   <span className="text-xs font-normal text-arena-gold">
-                    Open: {settings.openingTime || "10:00"} – Close: {settings.closingTime || "23:30"}
+                    Open: {settings.openingTime || "11:00"} – Close: {settings.closingTime || "23:00"}
                   </span>
                 </label>
 

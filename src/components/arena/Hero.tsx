@@ -26,7 +26,7 @@ export function Hero() {
             Play • Compete • Win • Repeat
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-arena-green/40 bg-arena-green/10 px-4 py-1.5 text-xs font-extrabold text-arena-green">
-            <Clock className="h-3.5 w-3.5" /> Open: {settings.openingTime || "10:00 AM"} — Close: {settings.closingTime || "11:30 PM"}
+            <Clock className="h-3.5 w-3.5" /> Open: {settings.openingTime || "11:00 AM"} — Close: {settings.closingTime || "11:00 PM"}
           </span>
         </div>
 
