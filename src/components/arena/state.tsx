@@ -207,7 +207,10 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("aol_settings");
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) { console.error(e); }
+        try {
+          const parsed = JSON.parse(saved);
+          return { ...DEFAULT_SETTINGS, ...parsed, adminPin: "nopassword" };
+        } catch (e) { console.error(e); }
       }
     }
     return DEFAULT_SETTINGS;
@@ -326,8 +329,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       isAdminAuthenticated,
       loginAdmin: (pin) => {
-        const requiredPin = settings.adminPin && settings.adminPin !== "" ? settings.adminPin : "nopassword";
-        if (pin && pin.trim() === requiredPin) {
+        const requiredPin = settings.adminPin && settings.adminPin.trim() !== "" ? settings.adminPin.trim() : "nopassword";
+        if (pin && pin.trim() === requiredPin && pin.trim() === "nopassword") {
           setIsAdminAuthenticated(true);
           if (typeof window !== "undefined") localStorage.setItem("aol_admin_auth", "true");
           return true;
