@@ -293,25 +293,64 @@
 
   </div>
 
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Collision Alert Modal -->
+  <div class="modal fade" id="collisionModal" tabindex="-1" aria-labelledby="collisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark-card border border-danger text-white">
+        <div class="modal-header border-bottom border-dark">
+          <h5 class="modal-title font-display text-danger fw-bold" id="collisionModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> Booking Collision Warning
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="collisionModalBody" class="fs-6 mb-0">
+            This station has an active online booking during the selected time window.
+          </p>
+        </div>
+        <div class="modal-footer border-top border-dark">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // -------------------------------------------------------------
     // 1. BUSINESS LOGIC & PRICING CONSTANTS
     // -------------------------------------------------------------
     const STATIONS_DEF = [
-      { id: 'PS5-VIP-1', name: 'PS5 VIP Lounge #1', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
-      { id: 'PS5-VIP-2', name: 'PS5 VIP Lounge #2', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
-      { id: 'SNOOKER-1', name: 'English Snooker Table #1', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
-      { id: 'SNOOKER-2', name: 'English Snooker Table #2', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
-      { id: 'FRENCH-1', name: 'French Billiards / Carom', category: 'French Billiards / Carom', ratePerMin: 2.67, hourly: 160, icon: '🥖' },
+      { id: 'PS5-VIP-1', name: 'PS5 VIP Lounge #1', zoneId: 'ps5', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
+      { id: 'PS5-VIP-2', name: 'PS5 VIP Lounge #2', zoneId: 'ps5', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
+      { id: 'SNOOKER-1', name: 'English Snooker Table #1', zoneId: 'snooker', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
+      { id: 'SNOOKER-2', name: 'English Snooker Table #2', zoneId: 'snooker', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
+      { id: 'FRENCH-1', name: 'French Billiards / Carom', zoneId: 'french', category: 'French Billiards / Carom', ratePerMin: 2.67, hourly: 160, icon: '🥖' },
     ];
 
     const STORAGE_KEY = 'aol_admin_sessions_v2';
     let sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let onlineBookings = [];
 
-    // Default form time initialization
+    // Supabase Initialization
+    const SUPABASE_URL = "https://c--7cad46cc-e814-4ea2-b13a-01ffb15e5f70-prod.lovable.cloud";
+    const SUPABASE_KEY = "sb_publishable_chSNlxe4Dtb2PMlXC987Yw_-xmWfnFt";
+    let supabaseClient = null;
+
+    if (window.supabase) {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } catch (err) {
+        console.warn("Supabase init error:", err);
+      }
+    }
+
+    // Default form time initialization & Supabase sync
     document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       const past = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
@@ -319,7 +358,30 @@
       document.getElementById('inputEnd').value = now.toTimeString().substring(0, 5);
       
       renderAll();
+      fetchOnlineBookings();
+      setInterval(fetchOnlineBookings, 15000); // Poll every 15s
     });
+
+    // -------------------------------------------------------------
+    // SUPABASE DATA FETCHING
+    // -------------------------------------------------------------
+    async function fetchOnlineBookings() {
+      if (!supabaseClient) return;
+      try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabaseClient
+          .from('bookings')
+          .select('*')
+          .filter('status', 'in', '("CONFIRMED","PENDING")');
+
+        if (!error && data) {
+          onlineBookings = data;
+          renderOperatingMetrics();
+        }
+      } catch (e) {
+        console.warn("Error fetching online bookings:", e);
+      }
+    }
 
     // -------------------------------------------------------------
     // 2. CALCULATION ENGINE & MIDNIGHT CROSSING HANDLER
@@ -353,8 +415,36 @@
       renderAll();
     }
 
+    // Helper: Check online booking collision for a station
+    function checkCollision(stationId, startStr, endStr) {
+      const stDef = STATIONS_DEF.find(x => x.id === stationId);
+      if (!stDef) return null;
+
+      const [startH, startM] = startStr.split(':').map(Number);
+      const [endH, endM] = endStr.split(':').map(Number);
+      const startMinutes = startH * 60 + startM;
+      let endMinutes = endH * 60 + endM;
+      if (endMinutes < startMinutes) endMinutes += 24 * 60;
+
+      for (const b of onlineBookings) {
+        if (b.zoneId === stDef.zoneId) {
+          const [bStartH, bStartM] = (b.startTime || "00:00").split(':').map(Number);
+          const [bEndH, bEndM] = (b.endTime || "00:00").split(':').map(Number);
+          const bStartMinutes = bStartH * 60 + bStartM;
+          let bEndMinutes = bEndH * 60 + bEndM;
+          if (bEndMinutes < bStartMinutes) bEndMinutes += 24 * 60;
+
+          // Check overlap
+          if (startMinutes < bEndMinutes && endMinutes > bStartMinutes) {
+            return b;
+          }
+        }
+      }
+      return null;
+    }
+
     // -------------------------------------------------------------
-    // 3. FORM SUBMISSION
+    // 3. FORM SUBMISSION WITH COLLISION MODAL
     // -------------------------------------------------------------
     function handleFormSubmit(e) {
       e.preventDefault();
@@ -367,6 +457,20 @@
 
       if (!playerName || !startStr || !endStr) {
         alert('Please fill out all required fields.');
+        return;
+      }
+
+      // Check collision with online reservations
+      const conflictingBooking = checkCollision(stationId, startStr, endStr);
+      if (conflictingBooking) {
+        const modalBody = document.getElementById('collisionModalBody');
+        modalBody.innerHTML = `
+          ⚠️ <strong>Collision Alert:</strong> Station <code>${stationId}</code> has an online booking reserved for 
+          <strong>${conflictingBooking.customerName || 'Customer'}</strong> (${conflictingBooking.startTime} - ${conflictingBooking.endTime}).
+          <br><br>Please select another time slot or table.
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('collisionModal'));
+        modal.show();
         return;
       }
 
@@ -495,6 +599,9 @@
       const container = document.getElementById('operatingMetricsContainer');
       container.innerHTML = '';
 
+      const now = new Date();
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+
       STATIONS_DEF.forEach(st => {
         const stationSessions = sessions.filter(s => s.stationId === st.id);
 
@@ -503,24 +610,55 @@
         let totalSessionsCount = stationSessions.length;
 
         if (stationSessions.length > 0) {
-          // Sort chronologically by start time
           const sorted = [...stationSessions].sort((a, b) => a.startTimeStr.localeCompare(b.startTimeStr));
           tableOpen = sorted[0].startTimeStr;
           
-          // Table Close = End time of chronologically last booking
           const sortedByEnd = [...stationSessions].sort((a, b) => a.endTimeStr.localeCompare(b.endTimeStr));
           tableClose = sortedByEnd[sortedByEnd.length - 1].endTimeStr;
         }
 
+        // Evaluate Online Reserved / Temporarily Booked state (within 15 mins or active)
+        const zoneOnlineBookings = onlineBookings.filter(b => b.zoneId === st.zoneId);
+        let upcomingBooking = null;
+
+        for (const b of zoneOnlineBookings) {
+          const [bStartH, bStartM] = (b.startTime || "00:00").split(':').map(Number);
+          const [bEndH, bEndM] = (b.endTime || "00:00").split(':').map(Number);
+          const bStartMins = bStartH * 60 + bStartM;
+          let bEndMins = bEndH * 60 + bEndM;
+          if (bEndMins < bStartMins) bEndMins += 24 * 60;
+
+          // Check if active or starting within 15 minutes
+          if ((nowMins >= bStartMins - 15 && nowMins <= bEndMins)) {
+            upcomingBooking = b;
+            break;
+          }
+        }
+
+        let reservedBadgeHtml = '';
+        let cardBorderClass = 'border-dark';
+
+        if (upcomingBooking) {
+          cardBorderClass = 'border-warning shadow-lg';
+          reservedBadgeHtml = `
+            <div class="alert alert-warning py-1.5 px-2 mb-2 small d-flex align-items-center justify-content-between">
+              <span><i class="bi bi-bookmark-star-fill text-warning me-1"></i> <strong>RESERVED:</strong> ${upcomingBooking.startTime} - ${upcomingBooking.endTime} (${upcomingBooking.customerName || 'Online'})</span>
+              <span class="badge bg-warning text-dark font-display">TEMP BOOKED</span>
+            </div>
+          `;
+        }
+
         const card = `
           <div class="col-12 col-md-6 col-lg-4">
-            <div class="card bg-dark-card border-dark p-3">
-              <div class="d-flex items-center justify-between mb-2">
+            <div class="card bg-dark-card ${cardBorderClass} p-3">
+              <div class="d-flex align-items-center justify-content-between mb-2">
                 <span class="fs-4">${st.icon}</span>
                 <span class="badge bg-dark border border-secondary text-gold">${st.category}</span>
               </div>
               <h6 class="font-display fw-bold text-white mb-2">${st.name}</h6>
               
+              ${reservedBadgeHtml}
+
               <div class="row g-2 text-center mt-1">
                 <div class="col-6">
                   <div class="bg-dark p-2 rounded-2 border border-dark">
@@ -536,7 +674,7 @@
                 </div>
               </div>
               
-              <div class="d-flex justify-content-between items-center mt-2 pt-2 border-top border-dark text-muted small">
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-dark text-muted small">
                 <span>Rate: ₹${st.ratePerMin.toFixed(2)}/min</span>
                 <span>Sessions: ${totalSessionsCount}</span>
               </div>
@@ -583,5 +721,7 @@
       a.click();
     }
   </script>
+</body>
+</html>
 </body>
 </html>
