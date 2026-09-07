@@ -94,7 +94,7 @@ function AdminContent() {
                   setPinInput(e.target.value);
                   setPinError("");
                 }}
-                placeholder="Enter password (default: nopassword)"
+                placeholder="Enter Manager Password"
                 className="w-full rounded-xl border border-arena-gold/30 bg-accent/40 px-4 py-3 text-center text-sm font-bold tracking-normal text-foreground placeholder:text-xs outline-none focus:border-arena-gold"
                 autoFocus
               />
@@ -104,10 +104,6 @@ function AdminContent() {
             {pinError && (
               <p className="text-xs font-bold text-arena-crimson animate-pulse">{pinError}</p>
             )}
-
-            <div className="rounded-xl border border-arena-gold/20 bg-accent/20 p-3 text-left text-xs text-muted-foreground">
-              <span className="font-bold text-arena-gold">🔑 Admin Access:</span> Password is set to <code className="text-arena-gold font-bold bg-black/40 px-1.5 py-0.5 rounded">nopassword</code>.
-            </div>
 
             <button
               type="submit"

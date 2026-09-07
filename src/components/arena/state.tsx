@@ -326,7 +326,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       isAdminAuthenticated,
       loginAdmin: (pin) => {
-        const requiredPin = settings.adminPin || "nopassword";
+        const requiredPin = settings.adminPin && settings.adminPin !== "" ? settings.adminPin : "nopassword";
         if (pin && pin.trim() === requiredPin) {
           setIsAdminAuthenticated(true);
           if (typeof window !== "undefined") localStorage.setItem("aol_admin_auth", "true");
