@@ -94,11 +94,11 @@ function AdminContent() {
                   setPinInput(e.target.value);
                   setPinError("");
                 }}
-                placeholder="Enter 4-digit PIN (e.g. 1234)"
-                className="w-full rounded-xl border border-arena-gold/30 bg-accent/40 px-4 py-3 text-center text-2xl font-bold tracking-widest text-foreground placeholder:text-sm placeholder:tracking-normal outline-none focus:border-arena-gold"
+                placeholder="No password required — Click Unlock"
+                className="w-full rounded-xl border border-arena-gold/30 bg-accent/40 px-4 py-3 text-center text-sm font-bold tracking-normal text-foreground placeholder:text-xs outline-none focus:border-arena-gold"
                 autoFocus
               />
-              <Lock className="absolute left-4 top-4 h-5 w-5 text-arena-gold/60" />
+              <Lock className="absolute left-4 top-3.5 h-5 w-5 text-arena-gold/60" />
             </div>
 
             {pinError && (
@@ -106,7 +106,7 @@ function AdminContent() {
             )}
 
             <div className="rounded-xl border border-arena-gold/20 bg-accent/20 p-3 text-left text-xs text-muted-foreground">
-              <span className="font-bold text-arena-gold">🔑 Demo Credentials:</span> Default Security PIN is <code className="rounded bg-accent px-1.5 py-0.5 font-bold text-foreground">1234</code>. You can change this anytime inside Admin Settings.
+              <span className="font-bold text-arena-gold">🔓 Open Access Enabled:</span> Password protection is turned off. Click below to enter manager portal.
             </div>
 
             <button
