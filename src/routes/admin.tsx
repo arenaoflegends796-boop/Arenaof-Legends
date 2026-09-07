@@ -74,9 +74,11 @@ function AdminContent() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-arena-dark px-4 py-12">
         <div className="glass-panel w-full max-w-md p-8 text-center shadow-[var(--shadow-gold)] border border-arena-gold/30">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl gold-gradient shadow-[var(--shadow-gold)] text-arena-dark">
-            <Shield className="h-8 w-8" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Arena of Legends Logo"
+            className="mx-auto h-20 w-20 rounded-2xl border-2 border-arena-gold/50 object-cover shadow-[var(--shadow-gold)]"
+          />
           <h1 className="mt-6 font-display text-2xl font-black tracking-wide text-gold-gradient">
             ARENA ADMIN PORTAL
           </h1>

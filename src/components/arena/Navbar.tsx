@@ -39,11 +39,13 @@ export function Navbar() {
       <nav className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 lg:flex lg:justify-between lg:px-8">
         <button
           onClick={() => go("hero")}
-          className="flex min-w-0 items-center gap-2 text-left tap-target"
+          className="flex min-w-0 items-center gap-2.5 text-left tap-target"
         >
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl gold-gradient shadow-[var(--shadow-gold)]">
-            <Crown className="h-5 w-5 text-arena-dark" />
-          </span>
+          <img
+            src="/logo.png"
+            alt="Arena of Legends"
+            className="h-10 w-10 shrink-0 rounded-xl border border-arena-gold/40 object-cover shadow-[var(--shadow-gold)]"
+          />
           <span className="truncate font-display lg:overflow-visible text-sm font-bold tracking-widest text-gold-gradient sm:text-base">
             ARENA OF LEGENDS
           </span>
