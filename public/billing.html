@@ -1,467 +1,442 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arena Of Legends — Gaming & Cue Sports Management System</title>
+  <title>Arena Of Legends — Gaming & Snooker Admin Dashboard</title>
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   
   <!-- Google Fonts: Orbitron & Rajdhani -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            arena: {
-              dark: '#0a0a0c',
-              card: '#121217',
-              border: '#23232f',
-              gold: '#f59e0b',
-              goldHover: '#d97706',
-              cyan: '#06b6d4',
-              green: '#10b981',
-              crimson: '#ef4444',
-              purple: '#8b5cf6'
-            }
-          },
-          fontFamily: {
-            display: ['Orbitron', 'sans-serif'],
-            body: ['Rajdhani', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-  
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
   <style>
+    :root {
+      --bg-dark: #0b0c10;
+      --card-dark: #12141c;
+      --border-dark: #242838;
+      --gold: #f59e0b;
+      --gold-hover: #d97706;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --crimson: #ef4444;
+      --purple: #8b5cf6;
+    }
+
     body {
-      background-color: #0a0a0c;
-      color: #f3f4f6;
+      background-color: var(--bg-dark);
+      color: #e2e8f0;
       font-family: 'Rajdhani', sans-serif;
+      font-size: 0.95rem;
     }
-    .glass-panel {
-      background: rgba(18, 18, 23, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(245, 158, 11, 0.2);
-      border-radius: 1rem;
+
+    .font-display {
+      font-family: 'Orbitron', sans-serif;
     }
-    .gold-gradient {
+
+    .text-gold {
+      color: var(--gold) !important;
+    }
+
+    .bg-dark-card {
+      background-color: var(--card-dark) !important;
+      border: 1px solid var(--border-dark);
+      border-radius: 0.75rem;
+    }
+
+    .btn-gold {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0b0c10;
+      font-weight: 800;
+      border: none;
+      border-radius: 0.6rem;
+      transition: all 0.2s ease;
     }
-    .gold-text {
+
+    .btn-gold:hover {
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #000;
+      transform: translateY(-1px);
     }
+
+    .table-dark-custom {
+      --bs-table-bg: var(--card-dark);
+      --bs-table-color: #e2e8f0;
+      --bs-table-border-color: var(--border-dark);
+    }
+
+    .stat-card-gold { border-left: 4px solid var(--gold) !important; }
+    .stat-card-green { border-left: 4px solid var(--green) !important; }
+    .stat-card-purple { border-left: 4px solid var(--purple) !important; }
+    .stat-card-crimson { border-left: 4px solid var(--crimson) !important; }
+    .stat-card-cyan { border-left: 4px solid var(--cyan) !important; }
+
+    /* Custom Form Styling */
+    .form-control, .form-select {
+      background-color: #1a1d29 !important;
+      border: 1px solid var(--border-dark) !important;
+      color: #f8fafc !important;
+      border-radius: 0.6rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.25) !important;
+    }
+
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0a0a0c; }
-    ::-webkit-scrollbar-thumb { background: #23232f; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
   </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="pb-5">
 
-  <!-- TOP NAVIGATION HEADER -->
-  <header class="sticky top-0 z-50 glass-panel rounded-none border-b border-arena-gold/30 px-4 py-3 sm:px-8">
-    <div class="mx-auto flex max-w-7xl items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="grid h-10 w-10 place-items-center rounded-xl gold-gradient text-arena-dark font-display font-black text-xl shadow-lg">
+  <!-- TOP HEADER -->
+  <header class="navbar navbar-dark bg-dark-card border-bottom border-dark px-3 py-2 sticky-top mb-4 shadow">
+    <div class="container-fluid max-w-7xl">
+      <a class="navbar-brand d-flex items-center gap-2" href="#">
+        <div class="bg-warning text-dark font-display fw-bold rounded-3 px-2.5 py-1 fs-5">
           👑
         </div>
         <div>
-          <h1 class="font-display text-xl font-black tracking-wider gold-text sm:text-2xl">
-            ARENA OF LEGENDS
-          </h1>
-          <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">
-            Gaming Parlor & Cue Sports Billing Manager
-          </p>
+          <span class="font-display fw-black text-gold tracking-wider fs-5">ARENA OF LEGENDS</span>
+          <span class="d-block text-muted text-uppercase tracking-widest small fw-semibold" style="font-size: 0.65rem;">
+            Gaming Parlor & Cue Sports Admin Dashboard
+          </span>
         </div>
-      </div>
+      </a>
 
-      <div class="flex items-center gap-3">
-        <button onclick="exportCSV()" class="flex items-center gap-1.5 rounded-xl border border-arena-gold/40 bg-arena-gold/10 px-3.5 py-2 text-xs font-bold text-arena-gold hover:bg-arena-gold hover:text-arena-dark transition-all">
-          📥 Export CSV
+      <div class="d-flex items-center gap-2">
+        <button onclick="exportCSV()" class="btn btn-outline-warning btn-sm fw-bold rounded-3">
+          <i class="bi bi-download me-1"></i> Export CSV
         </button>
-        <button onclick="confirmResetDay()" class="flex items-center gap-1.5 rounded-xl border border-arena-crimson/40 bg-arena-crimson/10 px-3.5 py-2 text-xs font-bold text-arena-crimson hover:bg-arena-crimson hover:text-white transition-all">
-          🔄 Reset Day
+        <button onclick="confirmResetDay()" class="btn btn-outline-danger btn-sm fw-bold rounded-3">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Day
         </button>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl px-4 pt-6 sm:px-8">
+  <div class="container-fluid px-3 px-md-4 max-w-7xl">
 
-    <!-- 1. SHIFT SETTLEMENT & REVENUE SUMMARY WIDGET -->
-    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+    <!-- 1. SHIFT SETTLEMENT SUMMARY WIDGET -->
+    <div class="row g-3 mb-4">
       <!-- Total Revenue -->
-      <div class="glass-panel p-4 border-l-4 border-l-arena-gold">
-        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Total Gross Revenue</p>
-        <h3 id="statTotalRev" class="mt-1 font-display text-2xl font-black text-white">₹0.00</h3>
-        <p id="statTotalMins" class="mt-1 text-xs text-gray-400">Total Played: 0 mins</p>
-      </div>
-
-      <!-- Online / UPI -->
-      <div class="glass-panel p-4 border-l-4 border-l-arena-purple">
-        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">UPI / Online Revenue</p>
-        <h3 id="statOnline" class="mt-1 font-display text-2xl font-black text-arena-purple">₹0.00</h3>
-        <p id="statOnlineCount" class="mt-1 text-xs text-gray-400">0 Payments</p>
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="card bg-dark-card p-3 stat-card-gold h-100 shadow-sm">
+          <div class="text-uppercase text-muted fw-bold small">Grand Total Revenue</div>
+          <div id="statTotalRev" class="font-display fs-3 fw-black text-white mt-1">₹0.00</div>
+          <div id="statTotalMins" class="small text-muted mt-1">Total Played: 0 mins</div>
+        </div>
       </div>
 
       <!-- Cash -->
-      <div class="glass-panel p-4 border-l-4 border-l-arena-green">
-        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Cash Collected</p>
-        <h3 id="statCash" class="mt-1 font-display text-2xl font-black text-arena-green">₹0.00</h3>
-        <p id="statCashCount" class="mt-1 text-xs text-gray-400">0 Payments</p>
-      </div>
-
-      <!-- Outstanding -->
-      <div class="glass-panel p-4 border-l-4 border-l-arena-crimson">
-        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Outstanding / Pending</p>
-        <h3 id="statPending" class="mt-1 font-display text-2xl font-black text-arena-crimson">₹0.00</h3>
-        <p id="statPendingCount" class="mt-1 text-xs text-gray-400">0 Unpaid Sessions</p>
-      </div>
-
-      <!-- Active Rigs -->
-      <div class="glass-panel p-4 border-l-4 border-l-arena-cyan">
-        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Active Live Rigs</p>
-        <h3 id="statActiveCount" class="mt-1 font-display text-2xl font-black text-arena-cyan">0 Rigs</h3>
-        <p class="mt-1 text-xs text-gray-400">Occupied Rigs Running</p>
-      </div>
-    </section>
-
-    <!-- 2. STATIONS & STATIONS LIVE TIMERS MATRIX -->
-    <section class="mb-10">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="font-display text-2xl font-black gold-text">STATION MANAGEMENT & LIVE TIMERS</h2>
-          <p class="text-xs text-gray-400">Exact per-minute billing. Minimum billable duration = 1 Minute.</p>
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="card bg-dark-card p-3 stat-card-green h-100 shadow-sm">
+          <div class="text-uppercase text-muted fw-bold small">Cash Collected</div>
+          <div id="statCash" class="font-display fs-3 fw-black text-success mt-1">₹0.00</div>
+          <div id="statCashCount" class="small text-muted mt-1">0 Cash Sessions</div>
         </div>
-        <button onclick="openManualModal()" class="rounded-xl gold-gradient px-4 py-2.5 text-xs font-black text-arena-dark shadow-lg hover:scale-105 transition-all">
-          ➕ Manual Session Entry
-        </button>
       </div>
 
-      <!-- Station Cards Container -->
-      <div id="stationsContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Rendered dynamically via JS -->
+      <!-- Online / UPI -->
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="card bg-dark-card p-3 stat-card-purple h-100 shadow-sm">
+          <div class="text-uppercase text-muted fw-bold small">Online / UPI Collected</div>
+          <div id="statOnline" class="font-display fs-3 fw-black text-purple mt-1" style="color: var(--purple);">₹0.00</div>
+          <div id="statOnlineCount" class="small text-muted mt-1">0 Online Sessions</div>
+        </div>
       </div>
-    </section>
 
-    <!-- 3. FILTERABLE SESSION LEDGER -->
-    <section class="glass-panel p-6 mb-10">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+      <!-- Pending Payments -->
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="card bg-dark-card p-3 stat-card-crimson h-100 shadow-sm">
+          <div class="text-uppercase text-muted fw-bold small">Pending Payments</div>
+          <div id="statPending" class="font-display fs-3 fw-black text-danger mt-1">₹0.00</div>
+          <div id="statPendingCount" class="small text-muted mt-1">0 Unpaid Sessions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ADMIN MANUAL ENTRY FORM -->
+    <div class="card bg-dark-card p-4 mb-4 shadow">
+      <div class="d-flex items-center justify-content-between mb-3 border-bottom border-dark pb-2">
         <div>
-          <h2 class="font-display text-xl font-black text-white">SESSION LEDGER & HISTORY</h2>
-          <p class="text-xs text-gray-400">Real-time log of all completed and ongoing sessions</p>
+          <h5 class="font-display fw-bold text-gold m-0">
+            <i class="bi bi-plus-circle me-1"></i> ADMIN MANUAL SESSION ENTRY FORM
+          </h5>
+          <p class="text-muted small m-0">
+            Exact per-minute billing. Minimum billable time = 1 minute (rounds up to 1 min).
+          </p>
+        </div>
+        <span class="badge bg-outline-warning text-gold border border-warning px-2.5 py-1">
+          Per-Minute Billing Active
+        </span>
+      </div>
+
+      <form id="adminForm" onsubmit="handleFormSubmit(event)" class="row g-3">
+        <!-- Customer Name -->
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-bold text-gray-300 small">Customer / Player Name *</label>
+          <input type="text" id="inputCustomer" required placeholder="e.g. Rahul Sharma" class="form-control" />
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-wrap items-center gap-3">
-          <select id="filterStation" onchange="renderLedger()" class="rounded-xl border border-arena-gold/30 bg-arena-card px-3 py-2 text-xs font-bold text-white outline-none focus:border-arena-gold">
-            <option value="ALL">All Stations</option>
-            <option value="PS5-VIP-1">PS5 VIP Setup 1</option>
-            <option value="PS5-VIP-2">PS5 VIP Setup 2</option>
-            <option value="SNOOKER-1">English Snooker Table 1</option>
-            <option value="SNOOKER-2">English Snooker Table 2</option>
-            <option value="FRENCH-1">French Billiards / Carom</option>
+        <!-- Station Select -->
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-bold text-gray-300 small">Table / Station Select *</label>
+          <select id="inputStation" required class="form-select">
+            <option value="PS5-VIP-1">PS5 VIP Lounge #1 (₹5.00/min · ₹300/hr)</option>
+            <option value="PS5-VIP-2">PS5 VIP Lounge #2 (₹5.00/min · ₹300/hr)</option>
+            <option value="SNOOKER-1">English Snooker Table #1 (₹4.00/min · ₹240/hr)</option>
+            <option value="SNOOKER-2">English Snooker Table #2 (₹4.00/min · ₹240/hr)</option>
+            <option value="FRENCH-1">French Billiards / Carom (₹2.67/min · ₹160/hr)</option>
           </select>
+        </div>
 
-          <select id="filterPayment" onchange="renderLedger()" class="rounded-xl border border-arena-gold/30 bg-arena-card px-3 py-2 text-xs font-bold text-white outline-none focus:border-arena-gold">
-            <option value="ALL">All Payment Types</option>
-            <option value="UPI">UPI / GPay / Online</option>
+        <!-- Payment Status -->
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-bold text-gray-300 small">Payment Status *</label>
+          <select id="inputPayment" required class="form-select">
+            <option value="UPI">Online / UPI / GPay</option>
             <option value="CASH">Cash</option>
             <option value="PENDING">Pending / Unpaid</option>
           </select>
         </div>
+
+        <!-- Start Time -->
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-bold text-gray-300 small">Start Time (HH:MM) *</label>
+          <input type="time" id="inputStart" required class="form-control" />
+        </div>
+
+        <!-- End Time -->
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-bold text-gray-300 small">End Time (HH:MM) *</label>
+          <input type="time" id="inputEnd" required class="form-control" />
+        </div>
+
+        <!-- Action Button -->
+        <div class="col-12 col-md-4 d-flex items-end">
+          <button type="submit" class="btn btn-gold w-100 py-2">
+            <i class="bi bi-calculator me-1"></i> Calculate & Add Session
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 3. DASHBOARD DISPLAY & ADMIN LEDGER TABLE -->
+    <div class="card bg-dark-card p-4 mb-4 shadow">
+      <div class="d-flex flex-column flex-md-row items-md-center justify-content-between mb-3 border-bottom border-dark pb-3 gap-2">
+        <div>
+          <h5 class="font-display fw-bold text-white m-0">ADMIN SESSION LEDGER</h5>
+          <p class="text-muted small m-0">All sessions stored in browser localStorage</p>
+        </div>
+
+        <div class="d-flex gap-2">
+          <select id="filterStation" onchange="renderLedger()" class="form-select form-select-sm" style="width: auto;">
+            <option value="ALL">All Stations</option>
+            <option value="PS5-VIP-1">PS5 VIP Rig #1</option>
+            <option value="PS5-VIP-2">PS5 VIP Rig #2</option>
+            <option value="SNOOKER-1">English Snooker #1</option>
+            <option value="SNOOKER-2">English Snooker #2</option>
+            <option value="FRENCH-1">French Billiards</option>
+          </select>
+
+          <select id="filterPayment" onchange="renderLedger()" class="form-select form-select-sm" style="width: auto;">
+            <option value="ALL">All Payment Status</option>
+            <option value="UPI">Online / UPI</option>
+            <option value="CASH">Cash</option>
+            <option value="PENDING">Pending</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Table -->
-      <div class="overflow-x-auto rounded-xl border border-arena-border">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-arena-card/80 text-gray-400 uppercase tracking-wider font-bold border-b border-arena-border">
-            <tr>
-              <th class="p-3.5">Station / Table</th>
-              <th class="p-3.5">Player Name</th>
-              <th class="p-3.5">Start Time</th>
-              <th class="p-3.5">End Time</th>
-              <th class="p-3.5">Duration</th>
-              <th class="p-3.5">Rate (/min)</th>
-              <th class="p-3.5">Total Bill</th>
-              <th class="p-3.5">Payment</th>
-              <th class="p-3.5 text-right">Actions</th>
+      <div class="table-responsive">
+        <table class="table table-dark table-dark-custom table-hover align-middle small m-0">
+          <thead>
+            <tr class="text-uppercase text-muted">
+              <th>Station</th>
+              <th>Player Name</th>
+              <th>Open Time (Start)</th>
+              <th>Close Time (End)</th>
+              <th>Duration (Mins)</th>
+              <th>Total Amount (₹)</th>
+              <th>Payment Method</th>
+              <th class="text-end">Actions</th>
             </tr>
           </thead>
-          <tbody id="ledgerTbody" class="divide-y divide-arena-border font-semibold">
+          <tbody id="ledgerTbody" class="fw-semibold">
             <!-- Rendered dynamically -->
           </tbody>
         </table>
       </div>
-    </section>
-
-  </main>
-
-  <!-- MANUAL ENTRY / EDIT MODAL -->
-  <div id="manualModal" class="fixed inset-0 z-50 hidden grid place-items-center bg-black/80 p-4 backdrop-blur-sm">
-    <div class="glass-panel w-full max-w-lg p-6 shadow-2xl relative">
-      <button onclick="closeManualModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white font-bold text-lg">✕</button>
-      
-      <h3 id="modalTitle" class="font-display text-xl font-black gold-text mb-4">Manual Session Entry</h3>
-      
-      <form id="manualForm" onsubmit="handleManualSubmit(event)" class="flex flex-col gap-4 text-xs">
-        <input type="hidden" id="editSessionId" value="" />
-
-        <div>
-          <label class="block font-bold text-gray-300 mb-1">Customer / Player Name *</label>
-          <input id="formCustomer" required placeholder="e.g. Rahul Sharma" class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold" />
-        </div>
-
-        <div>
-          <label class="block font-bold text-gray-300 mb-1">Select Station / Table *</label>
-          <select id="formStation" required class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold">
-            <option value="PS5-VIP-1">PS5 VIP Setup 1 (₹5.00/min)</option>
-            <option value="PS5-VIP-2">PS5 VIP Setup 2 (₹5.00/min)</option>
-            <option value="SNOOKER-1">English Snooker Table 1 (₹4.00/min)</option>
-            <option value="SNOOKER-2">English Snooker Table 2 (₹4.00/min)</option>
-            <option value="FRENCH-1">French Billiards / Carom (₹2.67/min)</option>
-          </select>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Start Time (HH:MM) *</label>
-            <input type="time" id="formStart" required class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold" />
-          </div>
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">End Time (HH:MM) *</label>
-            <input type="time" id="formEnd" required class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Payment Mode</label>
-            <select id="formPayment" class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold">
-              <option value="UPI">UPI / GPay / Online</option>
-              <option value="CASH">Cash</option>
-              <option value="PENDING">Pending / Unpaid</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-gray-300 mb-1">Notes / Game Played</label>
-            <input id="formNotes" placeholder="e.g. EA FC 26 / 8-Ball" class="w-full rounded-xl border border-arena-gold/30 bg-arena-card p-3 text-sm text-white outline-none focus:border-arena-gold" />
-          </div>
-        </div>
-
-        <div class="mt-4 flex gap-3">
-          <button type="button" onclick="closeManualModal()" class="flex-1 rounded-xl border border-arena-gold/30 p-3 font-bold text-gray-300 hover:bg-gray-800">Cancel</button>
-          <button type="submit" class="flex-1 rounded-xl gold-gradient p-3 font-black text-arena-dark shadow-lg">Save Session</button>
-        </div>
-      </form>
     </div>
+
+    <!-- 4. DYNAMIC OPERATING METRICS (DAILY OPEN/CLOSE CARDS) -->
+    <div class="card bg-dark-card p-4 shadow">
+      <h5 class="font-display fw-bold text-gold mb-3 border-bottom border-dark pb-2">
+        <i class="bi bi-clock-history me-1"></i> STATION DAILY OPERATING METRICS (OPEN & CLOSE TIMES)
+      </h5>
+      
+      <div id="operatingMetricsContainer" class="row g-3">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
+
   </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     // -------------------------------------------------------------
-    // PRICING CONSTANTS & STATION DEFINITIONS
+    // 1. BUSINESS LOGIC & PRICING CONSTANTS
     // -------------------------------------------------------------
     const STATIONS_DEF = [
-      { id: 'PS5-VIP-1', name: 'PlayStation 5 VIP Rig #1', category: 'PS5', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
-      { id: 'PS5-VIP-2', name: 'PlayStation 5 VIP Rig #2', category: 'PS5', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
-      { id: 'SNOOKER-1', name: 'English Snooker Table #1', category: 'Snooker', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
-      { id: 'SNOOKER-2', name: 'English Snooker Table #2', category: 'Snooker', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
-      { id: 'FRENCH-1', name: 'French Billiards / Carom', category: 'French', ratePerMin: 2.67, hourly: 160, icon: '🥖' },
+      { id: 'PS5-VIP-1', name: 'PS5 VIP Lounge #1', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
+      { id: 'PS5-VIP-2', name: 'PS5 VIP Lounge #2', category: 'PS5 VIP Lounge', ratePerMin: 5.00, hourly: 300, icon: '🎮' },
+      { id: 'SNOOKER-1', name: 'English Snooker Table #1', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
+      { id: 'SNOOKER-2', name: 'English Snooker Table #2', category: 'English Snooker Boards', ratePerMin: 4.00, hourly: 240, icon: '🎱' },
+      { id: 'FRENCH-1', name: 'French Billiards / Carom', category: 'French Billiards / Carom', ratePerMin: 2.67, hourly: 160, icon: '🥖' },
     ];
 
-    // STATE STORAGE KEYS
-    const STORAGE_SESSIONS = 'aol_manage_sessions_v1';
-    const STORAGE_ACTIVE_TIMERS = 'aol_manage_timers_v1';
+    const STORAGE_KEY = 'aol_admin_sessions_v2';
+    let sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
-    let sessions = JSON.parse(localStorage.getItem(STORAGE_SESSIONS) || '[]');
-    let activeTimers = JSON.parse(localStorage.getItem(STORAGE_ACTIVE_TIMERS) || '{}');
+    // Default form time initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const past = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
+      document.getElementById('inputStart').value = past.toTimeString().substring(0, 5);
+      document.getElementById('inputEnd').value = now.toTimeString().substring(0, 5);
+      
+      renderAll();
+    });
 
     // -------------------------------------------------------------
-    // UTILITY FUNCTIONS
+    // 2. CALCULATION ENGINE & MIDNIGHT CROSSING HANDLER
     // -------------------------------------------------------------
+    function calculateMinutesAndPrice(startStr, endStr, ratePerMin) {
+      const [startH, startM] = startStr.split(':').map(Number);
+      const [endH, endM] = endStr.split(':').map(Number);
+
+      let startTotalMins = startH * 60 + startM;
+      let endTotalMins = endH * 60 + endM;
+
+      // Handle midnight crossing (e.g. Start 23:00, End 01:30)
+      if (endTotalMins < startTotalMins) {
+        endTotalMins += 24 * 60; // Add 1440 minutes for next day
+      }
+
+      const diffMins = endTotalMins - startTotalMins;
+
+      // Minimum billable time rule = 1 minute (rounds up)
+      const durationMins = Math.max(1, Math.ceil(diffMins));
+      
+      // Total price calculation with rate per min
+      const totalPrice = Math.round(durationMins * ratePerMin * 100) / 100;
+
+      return { durationMins, totalPrice };
+    }
+
+    // Save and Render Trigger
     function saveState() {
-      localStorage.setItem(STORAGE_SESSIONS, JSON.stringify(sessions));
-      localStorage.setItem(STORAGE_ACTIVE_TIMERS, JSON.stringify(activeTimers));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
       renderAll();
     }
 
-    function formatTimeStr(isoString) {
-      if (!isoString) return '--:--';
-      const d = new Date(isoString);
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-    }
+    // -------------------------------------------------------------
+    // 3. FORM SUBMISSION
+    // -------------------------------------------------------------
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const playerName = document.getElementById('inputCustomer').value.trim();
+      const stationId = document.getElementById('inputStation').value;
+      const paymentMode = document.getElementById('inputPayment').value;
+      const startStr = document.getElementById('inputStart').value;
+      const endStr = document.getElementById('inputEnd').value;
 
-    function calculateSessionCost(startISO, endISO, ratePerMin) {
-      const start = new Date(startISO);
-      const end = new Date(endISO);
-      
-      let diffMs = end - start;
-      if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000; // Midnight crossing fix
-
-      // Minimum 1 minute billing rule
-      const rawMins = diffMs / (1000 * 60);
-      const durationMins = Math.max(1, Math.ceil(rawMins));
-      
-      const totalAmount = Math.round(durationMins * ratePerMin * 100) / 100;
-      return { durationMins, totalAmount };
-    }
-
-    // Calculate Table Open & Close Times for the day
-    function getStationOpenClose(stationId) {
-      const stationSessions = sessions.filter(s => s.stationId === stationId);
-      
-      // Check active live timer too
-      const activeTimer = activeTimers[stationId];
-      
-      if (stationSessions.length === 0 && !activeTimer) {
-        return { open: '--:--', close: '--:--' };
+      if (!playerName || !startStr || !endStr) {
+        alert('Please fill out all required fields.');
+        return;
       }
 
-      const allStarts = stationSessions.map(s => new Date(s.startTime).getTime());
-      const allEnds = stationSessions.map(s => new Date(s.endTime).getTime());
+      const stDef = STATIONS_DEF.find(x => x.id === stationId);
+      const { durationMins, totalPrice } = calculateMinutesAndPrice(startStr, endStr, stDef.ratePerMin);
 
-      if (activeTimer) {
-        allStarts.push(new Date(activeTimer.startTime).getTime());
-        allEnds.push(Date.now());
-      }
-
-      const minStart = new Date(Math.min(...allStarts));
-      const maxEnd = new Date(Math.max(...allEnds));
-
-      return {
-        open: minStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-        close: maxEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+      const newSession = {
+        id: 'ADM-' + Date.now(),
+        stationId,
+        stationName: stDef.name,
+        category: stDef.category,
+        playerName,
+        startTimeStr: startStr,
+        endTimeStr: endStr,
+        durationMins,
+        ratePerMin: stDef.ratePerMin,
+        totalPrice,
+        paymentMode,
+        timestamp: Date.now()
       };
+
+      sessions.unshift(newSession);
+      document.getElementById('inputCustomer').value = '';
+      
+      saveState();
     }
 
     // -------------------------------------------------------------
-    // RENDER FUNCTIONS
+    // 4. RENDERING DASHBOARD & WIDGETS
     // -------------------------------------------------------------
     function renderAll() {
-      renderWidgets();
-      renderStations();
+      renderShiftSettlement();
       renderLedger();
+      renderOperatingMetrics();
     }
 
-    function renderWidgets() {
-      let gross = 0;
+    function renderShiftSettlement() {
+      let grandTotal = 0;
       let totalMins = 0;
-      let online = 0;
-      let onlineCount = 0;
-      let cash = 0;
+      let cashTotal = 0;
       let cashCount = 0;
-      let pending = 0;
+      let onlineTotal = 0;
+      let onlineCount = 0;
+      let pendingTotal = 0;
       let pendingCount = 0;
 
       sessions.forEach(s => {
-        gross += s.totalAmount;
+        grandTotal += s.totalPrice;
         totalMins += s.durationMins;
 
-        if (s.paymentMode === 'UPI') {
-          online += s.totalAmount;
-          onlineCount++;
-        } else if (s.paymentMode === 'CASH') {
-          cash += s.totalAmount;
+        if (s.paymentMode === 'CASH') {
+          cashTotal += s.totalPrice;
           cashCount++;
+        } else if (s.paymentMode === 'UPI') {
+          onlineTotal += s.totalPrice;
+          onlineCount++;
         } else if (s.paymentMode === 'PENDING') {
-          pending += s.totalAmount;
+          pendingTotal += s.totalPrice;
           pendingCount++;
         }
       });
 
-      const activeCount = Object.keys(activeTimers).length;
-
-      document.getElementById('statTotalRev').innerText = `₹${gross.toFixed(2)}`;
+      document.getElementById('statTotalRev').innerText = `₹${grandTotal.toFixed(2)}`;
       document.getElementById('statTotalMins').innerText = `Total Played: ${totalMins} mins (${(totalMins/60).toFixed(1)} hrs)`;
-      document.getElementById('statOnline').innerText = `₹${online.toFixed(2)}`;
-      document.getElementById('statOnlineCount').innerText = `${onlineCount} Payments`;
-      document.getElementById('statCash').innerText = `₹${cash.toFixed(2)}`;
-      document.getElementById('statCashCount').innerText = `${cashCount} Payments`;
-      document.getElementById('statPending').innerText = `₹${pending.toFixed(2)}`;
+      document.getElementById('statCash').innerText = `₹${cashTotal.toFixed(2)}`;
+      document.getElementById('statCashCount').innerText = `${cashCount} Cash Sessions`;
+      document.getElementById('statOnline').innerText = `₹${onlineTotal.toFixed(2)}`;
+      document.getElementById('statOnlineCount').innerText = `${onlineCount} Online Sessions`;
+      document.getElementById('statPending').innerText = `₹${pendingTotal.toFixed(2)}`;
       document.getElementById('statPendingCount').innerText = `${pendingCount} Unpaid Sessions`;
-      document.getElementById('statActiveCount').innerText = `${activeCount} Rigs`;
-    }
-
-    function renderStations() {
-      const container = document.getElementById('stationsContainer');
-      container.innerHTML = '';
-
-      STATIONS_DEF.forEach(st => {
-        const timer = activeTimers[st.id];
-        const isOccupied = !!timer;
-        const openClose = getStationOpenClose(st.id);
-
-        let liveElapsedMins = 0;
-        let liveCost = 0;
-
-        if (isOccupied) {
-          const { durationMins, totalAmount } = calculateSessionCost(timer.startTime, new Date().toISOString(), st.ratePerMin);
-          liveElapsedMins = durationMins;
-          liveCost = totalAmount;
-        }
-
-        const cardHtml = `
-          <div class="glass-panel p-5 flex flex-col justify-between border ${isOccupied ? 'border-arena-cyan shadow-[var(--shadow-cyan)] bg-arena-cyan/5' : 'border-arena-border'}">
-            <div>
-              <!-- Open / Close Header Metrics -->
-              <div class="flex items-center justify-between border-b border-arena-border pb-3 mb-3 text-[11px]">
-                <div class="text-gray-400">
-                  <span>🌅 Open: <strong class="text-white">${openClose.open}</strong></span>
-                </div>
-                <div class="text-gray-400">
-                  <span>🌙 Close: <strong class="text-white">${openClose.close}</strong></span>
-                </div>
-              </div>
-
-              <!-- Station Info -->
-              <div class="flex items-start justify-between">
-                <div>
-                  <span class="text-2xl">${st.icon}</span>
-                  <h3 class="font-display font-bold text-base text-white mt-1">${st.name}</h3>
-                  <p class="text-xs text-arena-gold font-semibold">₹${st.hourly}/hr · ₹${st.ratePerMin.toFixed(2)}/min</p>
-                </div>
-                <span class="rounded-full px-2.5 py-1 text-[10px] font-black tracking-wider uppercase ${isOccupied ? 'bg-arena-cyan/20 text-arena-cyan border border-arena-cyan/40 animate-pulse' : 'bg-arena-green/20 text-arena-green border border-arena-green/40'}">
-                  ${isOccupied ? 'OCCUPIED' : 'AVAILABLE'}
-                </span>
-              </div>
-            </div>
-
-            <!-- Timer / Actions Section -->
-            <div class="mt-6">
-              ${isOccupied ? `
-                <div class="rounded-xl border border-arena-cyan/30 bg-arena-dark/80 p-3 mb-4 text-center">
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Live Player: <span class="text-white font-bold">${timer.playerName}</span></p>
-                  <div class="my-1 font-display text-3xl font-black text-arena-cyan">
-                    ${liveElapsedMins} <span class="text-sm font-normal text-gray-400">mins</span>
-                  </div>
-                  <p class="text-xs font-bold text-arena-gold">Current Bill: ₹${liveCost.toFixed(2)}</p>
-                </div>
-                <button onclick="stopTimer('${st.id}')" class="w-full rounded-xl bg-arena-crimson hover:bg-red-600 p-3 text-xs font-black text-white shadow-lg transition-all">
-                  🛑 Stop Session & Bill
-                </button>
-              ` : `
-                <div class="flex gap-2">
-                  <input id="input_name_${st.id}" placeholder="Player Name" class="w-full rounded-xl border border-arena-border bg-arena-card px-3 py-2 text-xs text-white outline-none focus:border-arena-gold" />
-                  <button onclick="startTimer('${st.id}')" class="rounded-xl gold-gradient px-4 py-2 text-xs font-black text-arena-dark shadow-lg hover:scale-105 transition-all shrink-0">
-                    ▶ Start
-                  </button>
-                </div>
-              `}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', cardHtml);
-      });
     }
 
     function renderLedger() {
@@ -478,216 +453,135 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-gray-500 italic">No session logs found matching filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4 italic">No session records found matching selected filters.</td></tr>`;
         return;
       }
 
       filtered.forEach(s => {
-        const stDef = STATIONS_DEF.find(x => x.id === s.stationId);
-        let pyBadge = '';
-        if (s.paymentMode === 'UPI') pyBadge = '<span class="rounded bg-arena-purple/20 text-arena-purple px-2 py-0.5 text-[10px] font-bold border border-arena-purple/30">UPI / GPay</span>';
-        else if (s.paymentMode === 'CASH') pyBadge = '<span class="rounded bg-arena-green/20 text-arena-green px-2 py-0.5 text-[10px] font-bold border border-arena-green/30">Cash</span>';
-        else pyBadge = '<span class="rounded bg-arena-crimson/20 text-arena-crimson px-2 py-0.5 text-[10px] font-bold border border-arena-crimson/30">Pending</span>';
+        let badgeClass = 'bg-secondary';
+        let badgeText = s.paymentMode;
 
-        const rowHtml = `
-          <tr class="hover:bg-arena-card/50 transition-colors">
-            <td class="p-3.5 text-white font-bold">${stDef ? stDef.name : s.stationId}</td>
-            <td class="p-3.5 text-gray-200">${s.playerName}</td>
-            <td class="p-3.5 text-gray-400">${formatTimeStr(s.startTime)}</td>
-            <td class="p-3.5 text-gray-400">${formatTimeStr(s.endTime)}</td>
-            <td class="p-3.5 font-bold text-arena-cyan">${s.durationMins} mins</td>
-            <td class="p-3.5 text-gray-400">₹${s.ratePerMin.toFixed(2)}</td>
-            <td class="p-3.5 font-display font-black text-white">₹${s.totalAmount.toFixed(2)}</td>
-            <td class="p-3.5">${pyBadge}</td>
-            <td class="p-3.5 text-right space-x-2">
-              <button onclick="editSession('${s.id}')" class="text-arena-gold hover:underline text-xs">Edit</button>
-              <button onclick="deleteSession('${s.id}')" class="text-arena-crimson hover:underline text-xs">Delete</button>
-            </td>
-          </tr>
+        if (s.paymentMode === 'UPI') {
+          badgeClass = 'bg-purple text-white';
+          badgeText = 'Online / UPI';
+        } else if (s.paymentMode === 'CASH') {
+          badgeClass = 'bg-success text-white';
+          badgeText = 'Cash';
+        } else if (s.paymentMode === 'PENDING') {
+          badgeClass = 'bg-danger text-white';
+          badgeText = 'Pending';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="text-white fw-bold">${s.stationName}</td>
+          <td>${s.playerName}</td>
+          <td class="text-muted"><i class="bi bi-clock me-1"></i>${s.startTimeStr}</td>
+          <td class="text-muted"><i class="bi bi-clock-fill me-1"></i>${s.endTimeStr}</td>
+          <td class="text-info fw-bold">${s.durationMins} mins</td>
+          <td class="font-display text-white fw-black">₹${s.totalPrice.toFixed(2)}</td>
+          <td><span class="badge ${badgeClass} px-2 py-1">${badgeText}</span></td>
+          <td class="text-end">
+            <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm py-0.5 px-2 text-xs">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </td>
         `;
-        tbody.insertAdjacentHTML('beforeend', rowHtml);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderOperatingMetrics() {
+      const container = document.getElementById('operatingMetricsContainer');
+      container.innerHTML = '';
+
+      STATIONS_DEF.forEach(st => {
+        const stationSessions = sessions.filter(s => s.stationId === st.id);
+
+        let tableOpen = '--:--';
+        let tableClose = '--:--';
+        let totalSessionsCount = stationSessions.length;
+
+        if (stationSessions.length > 0) {
+          // Sort chronologically by start time
+          const sorted = [...stationSessions].sort((a, b) => a.startTimeStr.localeCompare(b.startTimeStr));
+          tableOpen = sorted[0].startTimeStr;
+          
+          // Table Close = End time of chronologically last booking
+          const sortedByEnd = [...stationSessions].sort((a, b) => a.endTimeStr.localeCompare(b.endTimeStr));
+          tableClose = sortedByEnd[sortedByEnd.length - 1].endTimeStr;
+        }
+
+        const card = `
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card bg-dark-card border-dark p-3">
+              <div class="d-flex items-center justify-between mb-2">
+                <span class="fs-4">${st.icon}</span>
+                <span class="badge bg-dark border border-secondary text-gold">${st.category}</span>
+              </div>
+              <h6 class="font-display fw-bold text-white mb-2">${st.name}</h6>
+              
+              <div class="row g-2 text-center mt-1">
+                <div class="col-6">
+                  <div class="bg-dark p-2 rounded-2 border border-dark">
+                    <span class="d-block text-muted small uppercase" style="font-size: 0.65rem;">Table Open Time</span>
+                    <span class="font-display fw-bold text-success fs-6">${tableOpen}</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="bg-dark p-2 rounded-2 border border-dark">
+                    <span class="d-block text-muted small uppercase" style="font-size: 0.65rem;">Table Close Time</span>
+                    <span class="font-display fw-bold text-danger fs-6">${tableClose}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex justify-content-between items-center mt-2 pt-2 border-top border-dark text-muted small">
+                <span>Rate: ₹${st.ratePerMin.toFixed(2)}/min</span>
+                <span>Sessions: ${totalSessionsCount}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', card);
       });
     }
 
     // -------------------------------------------------------------
-    // TIMER ACTIONS
+    // 5. ACTIONS
     // -------------------------------------------------------------
-    function startTimer(stationId) {
-      const nameInput = document.getElementById(`input_name_${stationId}`);
-      const playerName = nameInput.value.trim() || 'Walk-in Player';
-
-      activeTimers[stationId] = {
-        playerName,
-        startTime: new Date().toISOString()
-      };
-
-      saveState();
-    }
-
-    function stopTimer(stationId) {
-      const timer = activeTimers[stationId];
-      if (!timer) return;
-
-      const stDef = STATIONS_DEF.find(x => x.id === stationId);
-      const endTimeISO = new Date().toISOString();
-
-      const { durationMins, totalAmount } = calculateSessionCost(timer.startTime, endTimeISO, stDef.ratePerMin);
-
-      const newSession = {
-        id: 'SESS-' + Date.now(),
-        stationId,
-        playerName: timer.playerName,
-        startTime: timer.startTime,
-        endTime: endTimeISO,
-        durationMins,
-        ratePerMin: stDef.ratePerMin,
-        totalAmount,
-        paymentMode: 'UPI', // default to UPI, can edit
-        notes: 'Live Stopwatch Session'
-      };
-
-      sessions.unshift(newSession);
-      delete activeTimers[stationId];
-
-      saveState();
-    }
-
-    // Live update interval every 5 seconds for elapsed timer calculation
-    setInterval(() => {
-      if (Object.keys(activeTimers).length > 0) {
-        renderStations();
-      }
-    }, 5000);
-
-    // -------------------------------------------------------------
-    // MANUAL MODAL & EDIT ACTIONS
-    // -------------------------------------------------------------
-    function openManualModal() {
-      document.getElementById('modalTitle').innerText = 'Manual Session Entry';
-      document.getElementById('editSessionId').value = '';
-      document.getElementById('manualForm').reset();
-      
-      const now = new Date();
-      const past = new Date(now.getTime() - 60 * 60 * 1000);
-      
-      document.getElementById('formStart').value = past.toTimeString().substring(0, 5);
-      document.getElementById('formEnd').value = now.toTimeString().substring(0, 5);
-
-      document.getElementById('manualModal').classList.remove('hidden');
-    }
-
-    function closeManualModal() {
-      document.getElementById('manualModal').classList.add('hidden');
-    }
-
-    function handleManualSubmit(e) {
-      e.preventDefault();
-      const editId = document.getElementById('editSessionId').value;
-      const playerName = document.getElementById('formCustomer').value.trim();
-      const stationId = document.getElementById('formStation').value;
-      const startStr = document.getElementById('formStart').value;
-      const endStr = document.getElementById('formEnd').value;
-      const paymentMode = document.getElementById('formPayment').value;
-      const notes = document.getElementById('formNotes').value;
-
-      const stDef = STATIONS_DEF.find(x => x.id === stationId);
-
-      const today = new Date().toISOString().split('T')[0];
-      const startISO = new Date(`${today}T${startStr}:00`).toISOString();
-      const endISO = new Date(`${today}T${endStr}:00`).toISOString();
-
-      const { durationMins, totalAmount } = calculateSessionCost(startISO, endISO, stDef.ratePerMin);
-
-      if (editId) {
-        // Edit existing
-        const idx = sessions.findIndex(s => s.id === editId);
-        if (idx !== -1) {
-          sessions[idx] = {
-            ...sessions[idx],
-            stationId,
-            playerName,
-            startTime: startISO,
-            endTime: endISO,
-            durationMins,
-            ratePerMin: stDef.ratePerMin,
-            totalAmount,
-            paymentMode,
-            notes
-          };
-        }
-      } else {
-        // Create new
-        sessions.unshift({
-          id: 'SESS-' + Date.now(),
-          stationId,
-          playerName,
-          startTime: startISO,
-          endTime: endISO,
-          durationMins,
-          ratePerMin: stDef.ratePerMin,
-          totalAmount,
-          paymentMode,
-          notes
-        });
-      }
-
-      closeManualModal();
-      saveState();
-    }
-
-    function editSession(id) {
-      const s = sessions.find(x => x.id === id);
-      if (!s) return;
-
-      document.getElementById('modalTitle').innerText = 'Edit Session';
-      document.getElementById('editSessionId').value = s.id;
-      document.getElementById('formCustomer').value = s.playerName;
-      document.getElementById('formStation').value = s.stationId;
-      document.getElementById('formStart').value = new Date(s.startTime).toTimeString().substring(0, 5);
-      document.getElementById('formEnd').value = new Date(s.endTime).toTimeString().substring(0, 5);
-      document.getElementById('formPayment').value = s.paymentMode;
-      document.getElementById('formNotes').value = s.notes || '';
-
-      document.getElementById('manualModal').classList.remove('hidden');
-    }
-
     function deleteSession(id) {
-      if (confirm('Are you sure you want to delete this session log?')) {
-        sessions = sessions.filter(x => x.id !== id);
+      if (confirm('Are you sure you want to delete this session record?')) {
+        sessions = sessions.filter(s => s.id !== id);
         saveState();
       }
     }
 
     function confirmResetDay() {
-      if (confirm('⚠️ Are you sure you want to RESET THE DAY? This will clear all session logs and active timers.')) {
+      if (confirm('⚠️ Are you sure you want to RESET THE DAY? This will clear all stored session logs from localStorage.')) {
         sessions = [];
-        activeTimers = {};
         saveState();
       }
     }
 
     function exportCSV() {
       if (sessions.length === 0) {
-        alert('No sessions available to export.');
+        alert('No sessions logged to export.');
         return;
       }
 
-      let csv = 'Session ID,Station,Player Name,Start Time,End Time,Duration (Mins),Rate (/min),Total Amount (INR),Payment Mode,Notes\n';
+      let csv = 'Station ID,Station Name,Player Name,Open Time (Start),Close Time (End),Duration (Mins),Rate (/min),Total Amount (INR),Payment Mode\n';
       sessions.forEach(s => {
-        const stDef = STATIONS_DEF.find(x => x.id === s.stationId);
-        csv += `"${s.id}","${stDef ? stDef.name : s.stationId}","${s.playerName}","${s.startTime}","${s.endTime}",${s.durationMins},${s.ratePerMin},${s.totalAmount},"${s.paymentMode}","${s.notes || ''}"\n`;
+        csv += `"${s.stationId}","${s.stationName}","${s.playerName}","${s.startTimeStr}","${s.endTimeStr}",${s.durationMins},${s.ratePerMin},${s.totalPrice},"${s.paymentMode}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.setAttribute('href', url);
-      a.setAttribute('download', `arena_sessions_${new Date().toISOString().split('T')[0]}.csv`);
+      a.setAttribute('download', `arena_admin_ledger_${new Date().toISOString().split('T')[0]}.csv`);
       a.click();
     }
-
-    // INITIAL RENDER
-    renderAll();
   </script>
 </body>
 </html>
