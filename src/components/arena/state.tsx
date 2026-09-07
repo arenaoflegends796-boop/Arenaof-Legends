@@ -82,80 +82,13 @@ const DEFAULT_SETTINGS: ArenaSettings = {
   peakEndHour: 22,
 };
 
-const MOCK_INITIAL_BOOKINGS: BookingItem[] = [
-  {
-    id: "BK-1001",
-    customerName: "Rahul Sharma",
-    phone: "+919811223344",
-    bookingDate: "2026-08-28",
-    slot: "18:00",
-    zoneIds: ["ps5"],
-    minutes: 120,
-    players: 2,
-    total: 600,
-    status: "confirmed",
-    createdAt: "2026-08-28T10:15:00Z",
-    preferredFormat: "EA FC 25 1v1",
-  },
-  {
-    id: "BK-1002",
-    customerName: "Vikram Singh",
-    phone: "+919877665544",
-    bookingDate: "2026-08-28",
-    slot: "19:30",
-    zoneIds: ["snooker"],
-    minutes: 90,
-    players: 2,
-    total: 360,
-    status: "pending",
-    createdAt: "2026-08-28T11:00:00Z",
-  },
-  {
-    id: "BK-1003",
-    customerName: "Ananya Iyer",
-    phone: "+919822334455",
-    bookingDate: "2026-08-27",
-    slot: "16:00",
-    zoneIds: ["ps5", "snooker"],
-    minutes: 180,
-    players: 4,
-    total: 1620,
-    status: "completed",
-    createdAt: "2026-08-27T12:00:00Z",
-  },
-  {
-    id: "BK-1004",
-    customerName: "Karan Mehta",
-    phone: "+919899887766",
-    bookingDate: "2026-08-26",
-    slot: "20:00",
-    zoneIds: ["french"],
-    minutes: 120,
-    players: 2,
-    total: 320,
-    status: "completed",
-    createdAt: "2026-08-26T15:30:00Z",
-  },
-  {
-    id: "BK-1005",
-    customerName: "Sameer Verma",
-    phone: "+919812345678",
-    bookingDate: "2026-08-25",
-    slot: "17:00",
-    zoneIds: ["ps5"],
-    minutes: 60,
-    players: 2,
-    total: 300,
-    status: "completed",
-    createdAt: "2026-08-25T14:00:00Z",
-  },
-];
+const MOCK_INITIAL_BOOKINGS: BookingItem[] = [];
 
 const DEFAULT_STATIONS: StationItem[] = [
-  { id: "ST-PS5-1", name: "PS5 VIP Station 1", zoneId: "ps5", status: "in_use", currentSessionMinutes: 75, startTime: "13:00", assignedCustomer: "Rahul Sharma" },
+  { id: "ST-PS5-1", name: "PS5 VIP Station 1", zoneId: "ps5", status: "available" },
   { id: "ST-PS5-2", name: "PS5 VIP Station 2", zoneId: "ps5", status: "available" },
   { id: "ST-SNK-1", name: "Snooker Board 1 (Strachan 6811)", zoneId: "snooker", status: "available" },
-  { id: "ST-SNK-2", name: "Snooker Board 2 (Tournament)", zoneId: "snooker", status: "in_use", currentSessionMinutes: 45, startTime: "13:30", assignedCustomer: "Vikram Singh" },
+  { id: "ST-SNK-2", name: "Snooker Board 2 (Tournament)", zoneId: "snooker", status: "available" },
   { id: "ST-FRN-1", name: "French Carom Table 1", zoneId: "french", status: "available" },
 ];
 
@@ -243,9 +176,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         try { return JSON.parse(saved); } catch (e) { console.error(e); }
       }
     }
-    return [
-      { id: "BLK-1", date: "2026-08-28", startTime: "14:00", endTime: "16:00", zoneId: "snooker", reason: "Tournament Cloth Maintenance" }
-    ];
+    return [];
   });
 
   useEffect(() => {
