@@ -67,7 +67,7 @@ export const DEFAULT_ZONES: Record<ZoneId, ZoneInfo> = {
 };
 
 const DEFAULT_SETTINGS: ArenaSettings = {
-  adminPin: "",
+  adminPin: "nopassword",
   surgeMultiplier: 1.2,
   surgeEnabled: false,
   arenaName: "Arena of Legends",

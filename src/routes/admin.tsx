@@ -66,7 +66,7 @@ function AdminContent() {
     if (loginAdmin(pinInput)) {
       setPinError("");
     } else {
-      setPinError("Invalid Admin PIN code. Default PIN is 1234");
+      setPinError("Invalid Admin password. Default is 'nopassword'");
     }
   };
 
@@ -88,13 +88,13 @@ function AdminContent() {
             <div className="relative">
               <input
                 type="password"
-                maxLength={8}
+                maxLength={20}
                 value={pinInput}
                 onChange={(e) => {
                   setPinInput(e.target.value);
                   setPinError("");
                 }}
-                placeholder="No password required — Click Unlock"
+                placeholder="Enter password (default: nopassword)"
                 className="w-full rounded-xl border border-arena-gold/30 bg-accent/40 px-4 py-3 text-center text-sm font-bold tracking-normal text-foreground placeholder:text-xs outline-none focus:border-arena-gold"
                 autoFocus
               />
@@ -106,7 +106,7 @@ function AdminContent() {
             )}
 
             <div className="rounded-xl border border-arena-gold/20 bg-accent/20 p-3 text-left text-xs text-muted-foreground">
-              <span className="font-bold text-arena-gold">🔓 Open Access Enabled:</span> Password protection is turned off. Click below to enter manager portal.
+              <span className="font-bold text-arena-gold">🔑 Admin Access:</span> Password is set to <code className="text-arena-gold font-bold bg-black/40 px-1.5 py-0.5 rounded">nopassword</code>.
             </div>
 
             <button
