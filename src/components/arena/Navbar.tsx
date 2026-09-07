@@ -106,51 +106,60 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-arena-dark/80 backdrop-blur-sm"
+        <div className="fixed inset-0 top-0 left-0 w-screen h-screen z-[9999] bg-[#0a0a0a] flex flex-col items-center justify-center p-6 lg:hidden overflow-y-auto">
+          <button
+            aria-label="Close menu"
             onClick={() => setOpen(false)}
-          />
-          <aside className="absolute inset-y-0 right-0 flex w-[86%] max-w-sm flex-col gap-2 glass-panel rounded-none p-5">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="font-display text-sm font-bold text-gold-gradient">MENU</span>
-              <button
-                aria-label="Close menu"
-                onClick={() => setOpen(false)}
-                className="grid h-11 w-11 place-items-center rounded-xl border border-arena-gold/30 text-arena-gold"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+            className="absolute top-5 right-5 grid h-12 w-12 place-items-center rounded-xl border border-arena-gold/40 text-arena-gold bg-arena-dark/80 tap-target"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          <div className="flex flex-col items-center justify-center gap-6 w-full max-w-sm text-center">
+            <span className="font-display text-lg font-black tracking-widest text-gold-gradient mb-2">
+              ARENA OF LEGENDS
+            </span>
+
             {LINKS.map((l) => (
               <button
                 key={l.id}
                 onClick={() => go(l.id)}
-                className="rounded-xl px-3 py-3 text-left text-base font-semibold text-foreground/90 transition-colors hover:bg-accent hover:text-arena-gold tap-target"
+                className="w-full rounded-xl py-3 px-4 text-center text-lg font-bold text-foreground transition-colors hover:text-arena-gold hover:bg-accent/40 tap-target"
               >
                 {l.label}
               </button>
             ))}
+
+            <Link
+              to="/dashboard"
+              onClick={() => setOpen(false)}
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-arena-gold/40 bg-accent/40 py-3.5 px-4 text-base font-bold text-arena-gold tap-target"
+            >
+              <User className="h-5 w-5" /> Player Portal
+            </Link>
+
             <Link
               to="/admin"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 rounded-xl border border-arena-gold/40 bg-accent/40 px-3 py-3 text-base font-bold text-arena-gold tap-target"
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-arena-gold/30 bg-accent/20 py-3.5 px-4 text-base font-bold text-muted-foreground hover:text-arena-gold tap-target"
             >
-              <Shield className="h-4 w-4" /> Admin Management Portal
+              <Shield className="h-5 w-5" /> Admin Management Portal
             </Link>
+
             <a
               href={`tel:${PHONE}`}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-arena-crimson/60 px-4 py-3 font-bold text-arena-crimson tap-target"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-arena-crimson/60 py-3.5 px-4 font-bold text-arena-crimson tap-target"
             >
-              <Phone className="h-4 w-4" /> Call Now
+              <Phone className="h-5 w-5" /> Call Now
             </a>
+
             <button
               onClick={() => go("booking")}
-              className="inline-flex items-center justify-center gap-2 rounded-xl gold-gradient px-4 py-3 font-extrabold text-arena-dark tap-target"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl gold-gradient py-4 px-4 font-extrabold text-arena-dark shadow-[var(--shadow-gold)] tap-target text-base"
             >
-              <Zap className="h-4 w-4" /> Book a Slot
+              <Zap className="h-5 w-5" /> Book a Slot Now
             </button>
-          </aside>
+          </div>
         </div>
       )}
     </header>
