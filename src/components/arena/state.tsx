@@ -223,12 +223,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   }, [settings]);
 
   // Admin Auth state
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("aol_admin_auth") === "true";
-    }
-    return false;
-  });
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
 
   // Public Booking Calculator State
   const [zones, setZones] = useState<ZoneId[]>(["ps5"]);
@@ -332,14 +327,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         const requiredPin = settings.adminPin && settings.adminPin.trim() !== "" ? settings.adminPin.trim() : "nopassword";
         if (pin && pin.trim() === requiredPin && pin.trim() === "nopassword") {
           setIsAdminAuthenticated(true);
-          if (typeof window !== "undefined") localStorage.setItem("aol_admin_auth", "true");
           return true;
         }
         return false;
       },
       logoutAdmin: () => {
         setIsAdminAuthenticated(false);
-        if (typeof window !== "undefined") localStorage.removeItem("aol_admin_auth");
       },
     };
   }, [zonesData, zones, minutes, players, bookings, blockedSlots, stations, settings, isAdminAuthenticated]);
