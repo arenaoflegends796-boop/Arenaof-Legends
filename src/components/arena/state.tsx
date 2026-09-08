@@ -89,6 +89,7 @@ const DEFAULT_STATIONS: StationItem[] = [
   { id: "ST-PS5-2", name: "PS5 VIP Station 2", zoneId: "ps5", status: "available" },
   { id: "ST-SNK-1", name: "Snooker Board 1 (Strachan 6811)", zoneId: "snooker", status: "available" },
   { id: "ST-SNK-2", name: "Snooker Board 2 (Tournament)", zoneId: "snooker", status: "available" },
+  { id: "ST-SNK-3", name: "Snooker Board 3 (Tournament)", zoneId: "snooker", status: "available" },
   { id: "ST-FRN-1", name: "French Carom Table 1", zoneId: "french", status: "available" },
 ];
 
