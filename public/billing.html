@@ -34,6 +34,7 @@
       color: #e2e8f0;
       font-family: 'Rajdhani', sans-serif;
       font-size: 0.95rem;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .font-display {
@@ -47,7 +48,7 @@
     .bg-dark-card {
       background-color: var(--card-dark) !important;
       border: 1px solid var(--border-dark);
-      border-radius: 0.75rem;
+      border-radius: 1rem;
     }
 
     .btn-gold {
@@ -55,8 +56,9 @@
       color: #0b0c10;
       font-weight: 800;
       border: none;
-      border-radius: 0.6rem;
+      border-radius: 0.75rem;
       transition: all 0.2s ease;
+      min-height: 48px;
     }
 
     .btn-gold:hover {
@@ -77,17 +79,33 @@
     .stat-card-crimson { border-left: 4px solid var(--crimson) !important; }
     .stat-card-cyan { border-left: 4px solid var(--cyan) !important; }
 
-    /* Custom Form Styling */
+    /* Custom Form Styling for Mobile */
     .form-control, .form-select {
       background-color: #1a1d29 !important;
       border: 1px solid var(--border-dark) !important;
       color: #f8fafc !important;
-      border-radius: 0.6rem;
+      border-radius: 0.75rem;
+      min-height: 48px;
+      font-size: 1rem !important;
     }
 
     .form-control:focus, .form-select:focus {
       border-color: var(--gold) !important;
       box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.25) !important;
+    }
+
+    /* Mobile Responsive Card Ledger View */
+    @media (max-width: 767.98px) {
+      .desktop-table-container { display: none !important; }
+      .mobile-ledger-container { display: block !important; }
+      .stat-card-title { font-size: 0.75rem !important; }
+      .stat-card-value { font-size: 1.65rem !important; }
+      .app-title-sub { display: none !important; }
+    }
+
+    @media (min-width: 768px) {
+      .mobile-ledger-container { display: none !important; }
+      .desktop-table-container { display: block !important; }
     }
 
     /* Custom Scrollbar */
@@ -261,7 +279,8 @@
         </div>
       </div>
 
-      <div class="table-responsive">
+      <!-- Desktop Table View (hidden on mobile) -->
+      <div class="table-responsive desktop-table-container">
         <table class="table table-dark table-dark-custom table-hover align-middle small m-0">
           <thead>
             <tr class="text-uppercase text-muted">
@@ -279,6 +298,11 @@
             <!-- Rendered dynamically -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Mobile Responsive Card View (visible on mobile) -->
+      <div id="mobileLedgerContainer" class="mobile-ledger-container d-flex flex-column gap-3">
+        <!-- Rendered dynamically via JS for mobile screens -->
       </div>
     </div>
 
@@ -548,7 +572,9 @@
 
     function renderLedger() {
       const tbody = document.getElementById('ledgerTbody');
+      const mobileContainer = document.getElementById('mobileLedgerContainer');
       tbody.innerHTML = '';
+      if (mobileContainer) mobileContainer.innerHTML = '';
 
       const filterSt = document.getElementById('filterStation').value;
       const filterPy = document.getElementById('filterPayment').value;
@@ -561,6 +587,9 @@
 
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4 italic">No session records found matching selected filters.</td></tr>`;
+        if (mobileContainer) {
+          mobileContainer.innerHTML = `<div class="p-4 text-center text-muted border border-dark rounded-3 italic">No session records found.</div>`;
+        }
         return;
       }
 
@@ -579,6 +608,7 @@
           badgeText = 'Pending';
         }
 
+        // Desktop Table Row
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="text-white fw-bold">${s.stationName}</td>
@@ -595,6 +625,41 @@
           </td>
         `;
         tbody.appendChild(tr);
+
+        // Mobile Responsive Card Row
+        if (mobileContainer) {
+          const mCard = document.createElement('div');
+          mCard.className = 'card bg-dark p-3 border border-dark rounded-3 shadow-sm';
+          mCard.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6 class="font-display fw-bold text-white mb-0">${s.stationName}</h6>
+                <span class="text-gold fw-bold small">${s.playerName}</span>
+              </div>
+              <span class="badge ${badgeClass} px-2.5 py-1 small">${badgeText}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center bg-dark-card p-2 rounded-2 border border-dark my-2">
+              <div class="small text-muted">
+                <i class="bi bi-clock me-1 text-info"></i> ${s.startTimeStr} – ${s.endTimeStr}
+              </div>
+              <div class="text-info fw-bold small">
+                ⏱️ ${s.durationMins} mins
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-1">
+              <div>
+                <span class="text-muted small">Total:</span>
+                <span class="font-display text-white fw-black fs-5 ms-1">₹${s.totalPrice.toFixed(2)}</span>
+              </div>
+              <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm px-3 py-1.5 fw-bold">
+                <i class="bi bi-trash me-1"></i> Delete
+              </button>
+            </div>
+          `;
+          mobileContainer.appendChild(mCard);
+        }
       });
     }
 
