@@ -504,53 +504,90 @@ export function BookingSection() {
               Scan the PhonePe QR Code below to pay <span className="font-bold text-arena-gold">{INR(total)}</span>
             </p>
 
-            {/* PhonePe QR Display */}
-            <div className="my-5 flex flex-col items-center justify-center rounded-2xl border border-arena-gold/20 bg-white p-5 text-black shadow-lg">
-              <div className="w-full max-w-[260px] rounded-xl border border-purple-200 bg-purple-50/50 p-4 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="font-display font-black text-purple-900 text-lg">PhonePe</span>
-                  <span className="rounded-md bg-orange-500 text-black px-2 py-0.5 text-xs font-black">ARENA OF LEGENDS</span>
+            {/* PhonePe Dynamic Payment Display */}
+            <div className="my-4 flex flex-col items-center justify-center rounded-2xl border border-arena-gold/30 bg-gradient-to-b from-purple-950/40 via-arena-dark to-arena-dark p-5 text-foreground shadow-2xl">
+              <div className="w-full max-w-[280px] rounded-2xl border border-purple-500/30 bg-arena-dark/90 p-4 text-center shadow-inner backdrop-blur-md">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-600 text-white font-black text-xs">
+                    pe
+                  </div>
+                  <span className="font-display font-black text-purple-300 text-lg tracking-wide">PhonePe</span>
+                  <span className="rounded-md bg-arena-gold/20 border border-arena-gold/40 text-arena-gold px-2 py-0.5 text-[10px] font-black uppercase">
+                    Merchant Verified
+                  </span>
                 </div>
-                <img
-                  src="/phonepe-qr-real.png"
-                  alt="PhonePe Arena Of Legends Scannable QR Code"
-                  className="w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm"
-                />
-                <p className="mt-3 text-[11px] font-bold text-gray-700">Scan using PhonePe / GPay / Paytm</p>
-                <p className="text-[10px] text-gray-500 font-mono">Terminal 2-Q063636960</p>
+
+                {/* Dynamic QR Code generated for exact merchant MID M22E5DQKX1GAN & booking total */}
+                <div className="relative mx-auto my-2 overflow-hidden rounded-xl border-2 border-purple-500/40 bg-white p-2 shadow-lg group">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                      `upi://pay?pa=Q063636960@ybl&pn=ARENA%20OF%20LEGENDS&mc=5812&tr=AOL${Date.now()}&am=${total}&cu=INR&tn=Slot%20Booking%20Arena%20of%20Legends`
+                    )}`}
+                    alt={`PhonePe QR Code for ₹${total}`}
+                    className="w-full h-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                  <div className="mt-1 text-[11px] font-black text-gray-900 bg-purple-100 rounded py-0.5 px-2 inline-block">
+                    Pay Exact Amount: ₹{total}
+                  </div>
+                </div>
+
+                <p className="mt-2 text-[11px] font-semibold text-muted-foreground">
+                  Scan with PhonePe, GPay, Paytm or BHIM
+                </p>
+                <p className="text-[10px] text-purple-300/80 font-mono mt-0.5">MID: M22E5DQKX1GAN | Q063636960@ybl</p>
               </div>
             </div>
 
-            {/* Direct UPI Link Button for Mobile */}
-            <a
-              href={`upi://pay?pa=Q063636960@ybl&pn=Arena%20Of%20Legends&am=${total}&cu=INR`}
-              className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-purple-700 hover:bg-purple-800 px-4 py-3 font-bold text-white transition-all shadow-md"
-            >
-              <span>📱 Open PhonePe / GPay App to Pay</span>
-            </a>
+            {/* Direct App Launch Buttons for Mobile */}
+            <div className="grid gap-2 sm:grid-cols-2 mb-4">
+              <a
+                href={`upi://pay?pa=Q063636960@ybl&pn=ARENA%20OF%20LEGENDS&am=${total}&cu=INR&tn=Slot%20Booking`}
+                className="flex items-center justify-center gap-2 rounded-xl bg-purple-700 hover:bg-purple-600 px-4 py-3 font-bold text-white transition-all shadow-md active:scale-95"
+              >
+                <span>📱 Pay via PhonePe App</span>
+              </a>
+              <a
+                href={`gpay://upi/pay?pa=Q063636960@ybl&pn=ARENA%20OF%20LEGENDS&am=${total}&cu=INR&tn=Slot%20Booking`}
+                className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-3 font-bold text-white transition-all shadow-md active:scale-95"
+              >
+                <span>⚡ Pay via GPay / Other UPI</span>
+              </a>
+            </div>
 
             {/* UTR Input Form */}
-            <div className="rounded-xl border border-arena-gold/20 bg-accent/30 p-4 text-left">
-              <label className="block text-xs font-bold uppercase tracking-wider text-arena-gold mb-1.5">
-                Step 2: Enter Transaction ID / UTR (12 digits)
+            <div className="rounded-xl border border-arena-gold/30 bg-accent/40 p-4 text-left shadow-inner">
+              <label className="block text-xs font-bold uppercase tracking-wider text-arena-gold mb-1.5 flex items-center justify-between">
+                <span>Enter 12-Digit Transaction UTR / Ref No.</span>
+                <span className="text-[10px] text-muted-foreground font-normal">Check PhonePe receipt</span>
               </label>
               <input
                 type="text"
+                maxLength={16}
                 placeholder="e.g. 423987654321"
                 value={utr}
                 onChange={(e) => setUtr(e.target.value)}
-                className="w-full rounded-xl border border-arena-gold/30 bg-arena-dark/80 px-4 py-2.5 text-sm text-foreground outline-none focus:border-arena-gold"
+                className="w-full rounded-xl border border-arena-gold/40 bg-arena-dark px-4 py-2.5 text-base font-mono font-bold text-arena-gold placeholder:text-muted-foreground/60 outline-none focus:border-arena-gold focus:ring-1 focus:ring-arena-gold"
               />
             </div>
 
-            <div className="mt-5 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2">
               <a
-                href={`${WHATSAPP}?text=Hi%20Arena%20Of%20Legends,%20I%20have%20completed%20the%20payment%20for%20my%20slot!%0A%0A👤%20Name:%20${encodeURIComponent(name)}%0A💰%20Amount:%20${encodeURIComponent(INR(total))}%0A🔢%20UTR%20/%20Txn%20ID:%20${encodeURIComponent(utr || "Not provided")}%0A%0ASending%20payment%20screenshot.`}
+                href={`${WHATSAPP}?text=${encodeURIComponent(
+                  `Hi Arena Of Legends! 👋 I have completed my slot booking payment via PhonePe.\n\n` +
+                  `👤 Name: ${name}\n` +
+                  `📱 Phone: ${phone}\n` +
+                  `📅 Date: ${date}\n` +
+                  `🕒 Time Slot: ${slot}\n` +
+                  `🕹️ Duration: ${minutes} mins\n` +
+                  `💰 Paid Amount: ${INR(total)}\n` +
+                  `🔢 PhonePe UTR / Txn ID: ${utr || "Attached Screenshot"}\n\n` +
+                  `Please confirm my slot booking! 🎮`
+                )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl gold-gradient px-5 py-3 font-extrabold text-arena-dark shadow-[var(--shadow-gold)] tap-target"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl gold-gradient px-5 py-3.5 font-extrabold text-arena-dark shadow-[var(--shadow-gold)] tap-target text-base transition-transform active:scale-[0.98]"
               >
-                Send Payment & UTR on WhatsApp
+                <span>✅ Confirm & Send Payment Receipt on WhatsApp</span>
               </a>
             </div>
           </div>
