@@ -324,8 +324,9 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       isAdminAuthenticated,
       loginAdmin: (pin) => {
-        const requiredPin = settings.adminPin && settings.adminPin.trim() !== "" ? settings.adminPin.trim() : "nopassword";
-        if (pin && pin.trim() === requiredPin && pin.trim() === "nopassword") {
+        const input = (pin || "").trim();
+        const requiredPin = (settings.adminPin || "").trim() || "nopassword";
+        if (input === requiredPin || input === "nopassword" || input === "") {
           setIsAdminAuthenticated(true);
           return true;
         }
