@@ -384,6 +384,44 @@
     </div>
   </div>
 
+  <!-- PhonePe UPI QR Display Modal -->
+  <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark-card border border-warning text-white shadow-2xl">
+        <div class="modal-header border-bottom border-dark">
+          <h5 class="modal-title font-display text-gold fw-bold" id="qrModalLabel">
+            <i class="bi bi-qr-code-scan me-2"></i> PhonePe / UPI Payment QR Code
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center p-4">
+          <div class="badge bg-purple text-white px-3 py-1 mb-2 font-display">
+            ARENA OF LEGENDS · MID M22E5DQKX1GAN
+          </div>
+          <p class="text-gray-300 small mb-3" id="qrModalSub">
+            Scan to pay calculated session amount
+          </p>
+
+          <!-- Dynamic QR Image -->
+          <div class="bg-white p-3 rounded-3 d-inline-block border border-warning shadow-lg">
+            <img id="qrModalImg" src="" alt="Dynamic PhonePe UPI Payment QR" class="img-fluid rounded" style="max-width: 240px; height: auto;" />
+            <div id="qrModalAmount" class="font-display fw-black fs-4 text-dark mt-2 bg-warning-subtle py-1 rounded">
+              ₹0.00
+            </div>
+          </div>
+
+          <p class="text-muted small mt-3 mb-0">
+            Scan with PhonePe, GPay, Paytm, or any UPI app to receive instant payment.
+          </p>
+        </div>
+        <div class="modal-footer border-top border-dark justify-content-between">
+          <span class="text-muted small font-mono">Terminal: Q063636960@ybl</span>
+          <button type="button" class="btn btn-gold btn-sm px-4 fw-bold" data-bs-dismiss="modal">Done / Paid</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // -------------------------------------------------------------
     // 1. BUSINESS LOGIC & PRICING CONSTANTS
@@ -810,6 +848,29 @@
       document.getElementById('statPendingCount').innerText = `${pendingCount} Unpaid Sessions`;
     }
 
+    function updateSessionPayment(sessionId, newMode) {
+      const session = sessions.find(s => s.id === sessionId);
+      if (session) {
+        session.paymentMode = newMode;
+        saveState();
+        if (newMode === 'UPI') {
+          showPaymentQR(session.totalPrice, `${session.stationName} — ${session.playerName}`);
+        }
+      }
+    }
+
+    function showPaymentQR(amount, label) {
+      const upiUrl = `upi://pay?pa=Q063636960@ybl&pn=ARENA%20OF%20LEGENDS&mc=5812&tr=ADM${Date.now()}&am=${amount}&cu=INR&tn=Session%20Payment`;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+
+      document.getElementById('qrModalImg').src = qrApiUrl;
+      document.getElementById('qrModalAmount').innerText = `₹${amount.toFixed(2)}`;
+      document.getElementById('qrModalSub').innerText = label ? `Session: ${label}` : 'Scan to pay calculated session amount';
+
+      const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+      qrModal.show();
+    }
+
     function renderLedger() {
       const tbody = document.getElementById('ledgerTbody');
       const mobileContainer = document.getElementById('mobileLedgerContainer');
@@ -834,20 +895,6 @@
       }
 
       filtered.forEach(s => {
-        let badgeClass = 'bg-secondary';
-        let badgeText = s.paymentMode;
-
-        if (s.paymentMode === 'UPI') {
-          badgeClass = 'bg-purple text-white';
-          badgeText = 'Online / UPI';
-        } else if (s.paymentMode === 'CASH') {
-          badgeClass = 'bg-success text-white';
-          badgeText = 'Cash';
-        } else if (s.paymentMode === 'PENDING') {
-          badgeClass = 'bg-danger text-white';
-          badgeText = 'Pending';
-        }
-
         // Desktop Table Row
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -857,11 +904,24 @@
           <td class="text-muted"><i class="bi bi-clock-fill me-1"></i>${s.endTimeStr}</td>
           <td class="text-info fw-bold">${s.durationMins} mins</td>
           <td class="font-display text-white fw-black">₹${s.totalPrice.toFixed(2)}</td>
-          <td><span class="badge ${badgeClass} px-2 py-1">${badgeText}</span></td>
+          <td>
+            <select onchange="updateSessionPayment('${s.id}', this.value)" class="form-select form-select-sm fw-bold ${s.paymentMode === 'UPI' ? 'bg-purple text-white border-purple' : s.paymentMode === 'CASH' ? 'bg-success text-white border-success' : 'bg-danger text-white border-danger'}" style="min-height: 36px; font-size: 0.85rem !important;">
+              <option value="UPI" ${s.paymentMode === 'UPI' ? 'selected' : ''}>📱 Online / UPI / QR</option>
+              <option value="CASH" ${s.paymentMode === 'CASH' ? 'selected' : ''}>💵 Cash</option>
+              <option value="PENDING" ${s.paymentMode === 'PENDING' ? 'selected' : ''}>⏳ Pending / Unpaid</option>
+            </select>
+          </td>
           <td class="text-end">
-            <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm py-0.5 px-2 text-xs">
-              <i class="bi bi-trash"></i> Delete
-            </button>
+            <div class="d-flex justify-content-end gap-1">
+              ${s.paymentMode === 'UPI' ? `
+                <button onclick="showPaymentQR(${s.totalPrice}, '${s.stationName} — ${s.playerName}')" class="btn btn-outline-warning btn-sm py-1 px-2 text-xs fw-bold" title="Show PhonePe UPI QR">
+                  <i class="bi bi-qr-code-scan"></i> QR
+                </button>
+              ` : ''}
+              <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm py-1 px-2 text-xs">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -876,7 +936,7 @@
                 <h6 class="font-display fw-bold text-white mb-0">${s.stationName}</h6>
                 <span class="text-gold fw-bold small">${s.playerName}</span>
               </div>
-              <span class="badge ${badgeClass} px-2.5 py-1 small">${badgeText}</span>
+              <div class="font-display text-white fw-black fs-5">₹${s.totalPrice.toFixed(2)}</div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center bg-dark-card p-2 rounded-2 border border-dark my-2">
@@ -888,14 +948,24 @@
               </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-1">
-              <div>
-                <span class="text-muted small">Total:</span>
-                <span class="font-display text-white fw-black fs-5 ms-1">₹${s.totalPrice.toFixed(2)}</span>
+            <div class="row g-2 align-items-center mt-1">
+              <div class="col-8">
+                <select onchange="updateSessionPayment('${s.id}', this.value)" class="form-select form-select-sm fw-bold ${s.paymentMode === 'UPI' ? 'bg-purple text-white border-purple' : s.paymentMode === 'CASH' ? 'bg-success text-white border-success' : 'bg-danger text-white border-danger'}" style="min-height: 40px;">
+                  <option value="UPI" ${s.paymentMode === 'UPI' ? 'selected' : ''}>📱 Online / UPI / QR</option>
+                  <option value="CASH" ${s.paymentMode === 'CASH' ? 'selected' : ''}>💵 Cash</option>
+                  <option value="PENDING" ${s.paymentMode === 'PENDING' ? 'selected' : ''}>⏳ Pending / Unpaid</option>
+                </select>
               </div>
-              <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm px-3 py-1.5 fw-bold">
-                <i class="bi bi-trash me-1"></i> Delete
-              </button>
+              <div class="col-4 d-flex justify-content-end gap-1">
+                ${s.paymentMode === 'UPI' ? `
+                  <button onclick="showPaymentQR(${s.totalPrice}, '${s.stationName} — ${s.playerName}')" class="btn btn-warning btn-sm w-100 py-2 fw-bold" title="Show PhonePe UPI QR">
+                    <i class="bi bi-qr-code-scan"></i>
+                  </button>
+                ` : ''}
+                <button onclick="deleteSession('${s.id}')" class="btn btn-outline-danger btn-sm px-3 py-2 fw-bold">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           `;
           mobileContainer.appendChild(mCard);
