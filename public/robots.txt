@@ -1,3 +1,5 @@
+Sitemap: https://arenaoflegends.in/sitemap.xml
+
 User-agent: Googlebot
 Allow: /
 
