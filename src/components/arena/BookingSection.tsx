@@ -244,6 +244,15 @@ export function BookingSection() {
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           {/* Calculator */}
           <div className="glass-panel p-6">
+            {blockedSlots.some((b) => b.date === new Date().toISOString().split("T")[0]) && (
+              <div className="mb-4 rounded-xl border border-arena-crimson/50 bg-arena-crimson/15 p-3 text-xs font-bold text-arena-crimson animate-pulse flex items-center gap-2">
+                <span className="text-base">🔴</span>
+                <div>
+                  <span className="font-extrabold uppercase">Live Arena Notice:</span> Some gaming zones are currently occupied by live players in the arena. Unavailable time slots are marked in red below.
+                </div>
+              </div>
+            )}
+
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Select zones
             </p>
@@ -251,22 +260,41 @@ export function BookingSection() {
               {ZONE_LIST.map((z) => {
                 const active = zones.includes(z);
                 const info = zonesData[z];
+                const todayStr = new Date().toISOString().split("T")[0];
+                const isLiveBooked = blockedSlots.some(
+                  (b) => b.date === todayStr && (b.zoneId === z || b.zoneId === "all")
+                );
+
                 return (
                   <button
                     key={z}
                     type="button"
                     onClick={() => toggleZone(z)}
-                    className={`rounded-2xl border px-3 py-4 text-left transition-shadow tap-target ${
-                      active
+                    className={`relative rounded-2xl border px-3 py-4 text-left transition-all tap-target ${
+                      isLiveBooked
+                        ? "border-arena-crimson/60 bg-arena-crimson/10 shadow-[0_0_15px_rgba(239,68,68,0.25)]"
+                        : active
                         ? "border-arena-gold bg-accent/60 shadow-[var(--shadow-gold)]"
                         : "border-arena-gold/15 bg-accent/20"
                     }`}
                   >
+                    {isLiveBooked && (
+                      <span className="absolute -top-2 -right-2 rounded-full border border-arena-crimson/80 bg-arena-crimson px-2 py-0.5 text-[9px] font-black uppercase text-white shadow-md animate-pulse">
+                        🔴 LIVE BOOKED
+                      </span>
+                    )}
+
                     <span className="text-xl">{info?.emoji}</span>
                     <span className="mt-1 block text-sm font-bold">{info?.name}</span>
                     <span className="text-xs font-semibold text-arena-gold">
                       {INR(info?.rate || 0)}/hr
                     </span>
+
+                    {isLiveBooked && (
+                      <span className="mt-1 block text-[10px] font-bold text-arena-crimson uppercase">
+                        Currently in-use
+                      </span>
+                    )}
                   </button>
                 );
               })}
