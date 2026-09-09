@@ -217,10 +217,10 @@
       </div>
 
       <form id="adminForm" onsubmit="handleFormSubmit(event)" class="row g-3">
-        <!-- Customer Name -->
+        <!-- Customer Name (Optional) -->
         <div class="col-12 col-md-4">
-          <label class="form-label fw-bold text-gray-300 small">Customer / Player Name *</label>
-          <input type="text" id="inputCustomer" required placeholder="e.g. Rahul Sharma" class="form-control" />
+          <label class="form-label fw-bold text-gray-300 small">Customer / Player Name (Optional)</label>
+          <input type="text" id="inputCustomer" placeholder="e.g. Rahul Sharma (or leave blank)" class="form-control" />
         </div>
 
         <!-- Station Select -->
@@ -246,16 +246,16 @@
           </select>
         </div>
 
-        <!-- Start Time -->
+        <!-- Start Time (Typable or Selectable) -->
         <div class="col-12 col-md-4">
-          <label class="form-label fw-bold text-gray-300 small">Start Time (HH:MM) *</label>
-          <input type="time" id="inputStart" required class="form-control" />
+          <label class="form-label fw-bold text-gray-300 small">Start Time (HH:MM or 24-hr) *</label>
+          <input type="text" id="inputStart" required placeholder="e.g. 09:30 or 14:15" pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" title="Enter valid time in HH:MM format e.g. 09:30 or 14:15" class="form-control font-mono" />
         </div>
 
-        <!-- End Time -->
+        <!-- End Time (Typable or Selectable) -->
         <div class="col-12 col-md-4">
-          <label class="form-label fw-bold text-gray-300 small">End Time (HH:MM) *</label>
-          <input type="time" id="inputEnd" required class="form-control" />
+          <label class="form-label fw-bold text-gray-300 small">End Time (HH:MM or 24-hr) *</label>
+          <input type="text" id="inputEnd" required placeholder="e.g. 10:45 or 16:30" pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" title="Enter valid time in HH:MM format e.g. 10:45 or 16:30" class="form-control font-mono" />
         </div>
 
         <!-- Action Button -->
@@ -516,14 +516,15 @@
     function handleFormSubmit(e) {
       e.preventDefault();
       
-      const playerName = document.getElementById('inputCustomer').value.trim();
+      const rawName = document.getElementById('inputCustomer').value.trim();
+      const playerName = rawName || 'Walk-in Player';
       const stationId = document.getElementById('inputStation').value;
       const paymentMode = document.getElementById('inputPayment').value;
-      const startStr = document.getElementById('inputStart').value;
-      const endStr = document.getElementById('inputEnd').value;
+      const startStr = document.getElementById('inputStart').value.trim();
+      const endStr = document.getElementById('inputEnd').value.trim();
 
-      if (!playerName || !startStr || !endStr) {
-        alert('Please fill out all required fields.');
+      if (!startStr || !endStr) {
+        alert('Please enter both Start Time and End Time in HH:MM format (e.g. 09:30 or 14:15).');
         return;
       }
 
