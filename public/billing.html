@@ -322,7 +322,28 @@
       </div>
     </div>
 
-    <!-- 4. DYNAMIC OPERATING METRICS (DAILY OPEN/CLOSE CARDS) -->
+    <!-- 4. LIVE TABLE TIMERS & STOPWATCH CONTROL -->
+    <div class="card bg-dark-card p-4 mb-4 shadow border-warning">
+      <div class="d-flex flex-column flex-md-row items-md-center justify-content-between mb-3 border-bottom border-dark pb-2 gap-2">
+        <div>
+          <h5 class="font-display fw-bold text-gold m-0">
+            <i class="bi bi-stopwatch-fill me-1"></i> LIVE TABLE TIMERS & INSTANT BILLING
+          </h5>
+          <p class="text-white small m-0">
+            Start timer when player begins. Tapping <strong>STOP TIMER</strong> automatically calculates elapsed minutes, total price, and populates the session entry!
+          </p>
+        </div>
+        <span class="badge bg-warning text-dark font-display px-3 py-1.5 fw-bold">
+          ⚡ REAL-TIME TICKER ACTIVE
+        </span>
+      </div>
+
+      <div id="liveTimersGrid" class="row g-3">
+        <!-- Dynamically rendered via JS for each table -->
+      </div>
+    </div>
+
+    <!-- 5. DYNAMIC OPERATING METRICS (DAILY OPEN/CLOSE CARDS) -->
     <div class="card bg-dark-card p-4 shadow">
       <h5 class="font-display fw-bold text-gold mb-3 border-bottom border-dark pb-2">
         <i class="bi bi-clock-history me-1"></i> STATION DAILY OPERATING METRICS (OPEN & CLOSE TIMES)
@@ -377,7 +398,9 @@
     ];
 
     const STORAGE_KEY = 'aol_admin_sessions_v2';
+    const TIMERS_STORAGE_KEY = 'aol_live_timers_v1';
     let sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let liveTimers = JSON.parse(localStorage.getItem(TIMERS_STORAGE_KEY) || '{}');
     let onlineBookings = [];
 
     // Supabase Initialization
@@ -403,6 +426,7 @@
       renderAll();
       fetchOnlineBookings();
       setInterval(fetchOnlineBookings, 15000); // Poll every 15s
+      setInterval(tickLiveTimers, 1000); // Live timer ticker every 1 sec
     });
 
     // -------------------------------------------------------------
@@ -542,9 +566,157 @@
     }
 
     // -------------------------------------------------------------
+    // LIVE TIMER & STOPWATCH ENGINE FOR ALL TABLES
+    // -------------------------------------------------------------
+    function saveTimersState() {
+      localStorage.setItem(TIMERS_STORAGE_KEY, JSON.stringify(liveTimers));
+    }
+
+    function startTimer(stationId) {
+      const now = Date.now();
+      const startTimeStr = new Date(now).toTimeString().substring(0, 5);
+      liveTimers[stationId] = {
+        startTimeMs: now,
+        startTimeStr: startTimeStr,
+        status: 'running'
+      };
+      saveTimersState();
+      renderLiveTimers();
+    }
+
+    function stopTimer(stationId) {
+      const timer = liveTimers[stationId];
+      if (!timer) return;
+      const now = Date.now();
+      const endTimeStr = new Date(now).toTimeString().substring(0, 5);
+      const stDef = STATIONS_DEF.find(x => x.id === stationId);
+
+      const elapsedMs = now - timer.startTimeMs;
+      const durationMins = Math.max(1, Math.ceil(elapsedMs / 60000));
+      const totalPrice = Math.round(durationMins * stDef.ratePerMin * 100) / 100;
+
+      // Auto populate entry form for quick adding!
+      document.getElementById('inputStation').value = stationId;
+      document.getElementById('inputStart').value = timer.startTimeStr;
+      document.getElementById('inputEnd').value = endTimeStr;
+
+      delete liveTimers[stationId];
+      saveTimersState();
+      renderLiveTimers();
+
+      // Highlight form
+      document.getElementById('adminForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetTimer(stationId) {
+      if (confirm(`Reset active timer for ${stationId}?`)) {
+        delete liveTimers[stationId];
+        saveTimersState();
+        renderLiveTimers();
+      }
+    }
+
+    function tickLiveTimers() {
+      const now = Date.now();
+      STATIONS_DEF.forEach(st => {
+        const timer = liveTimers[st.id];
+        if (timer && timer.status === 'running') {
+          const elapsedSecs = Math.floor((now - timer.startTimeMs) / 1000);
+          const hrs = Math.floor(elapsedSecs / 3600);
+          const mins = Math.floor((elapsedSecs % 3600) / 60);
+          const secs = elapsedSecs % 60;
+          const timeFormatted = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+          const durationMins = Math.max(1, Math.ceil(elapsedSecs / 60));
+          const estPrice = (durationMins * st.ratePerMin).toFixed(2);
+
+          const timeEl = document.getElementById(`timerDisplay-${st.id}`);
+          const priceEl = document.getElementById(`timerPrice-${st.id}`);
+
+          if (timeEl) timeEl.innerText = timeFormatted;
+          if (priceEl) priceEl.innerText = `₹${estPrice}`;
+        }
+      });
+    }
+
+    function renderLiveTimers() {
+      const container = document.getElementById('liveTimersGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const now = Date.now();
+
+      STATIONS_DEF.forEach(st => {
+        const timer = liveTimers[st.id];
+        const isRunning = timer && timer.status === 'running';
+
+        let elapsedStr = '00:00:00';
+        let estPriceStr = '₹0.00';
+        let startStr = '--:--';
+
+        if (isRunning) {
+          const elapsedSecs = Math.floor((now - timer.startTimeMs) / 1000);
+          const hrs = Math.floor(elapsedSecs / 3600);
+          const mins = Math.floor((elapsedSecs % 3600) / 60);
+          const secs = elapsedSecs % 60;
+          elapsedStr = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+          
+          const durationMins = Math.max(1, Math.ceil(elapsedSecs / 60));
+          estPriceStr = `₹${(durationMins * st.ratePerMin).toFixed(2)}`;
+          startStr = timer.startTimeStr;
+        }
+
+        const borderClass = isRunning ? 'border-warning bg-dark' : 'border-dark bg-dark';
+
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+        col.innerHTML = `
+          <div class="card ${borderClass} p-3 shadow-sm rounded-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fs-4">${st.icon}</span>
+              <span class="badge ${isRunning ? 'bg-danger text-white animate-pulse' : 'bg-secondary text-white'} px-2.5 py-1">
+                ${isRunning ? '🔴 LIVE IN USE' : '⚪ IDLE / READY'}
+              </span>
+            </div>
+
+            <h6 class="font-display fw-bold text-white mb-1">${st.name}</h6>
+            <div class="text-gold small fw-bold mb-2">Rate: ₹${st.ratePerMin.toFixed(2)}/min (₹${st.hourly}/hr)</div>
+
+            <div class="bg-dark-card p-3 rounded-3 text-center border border-dark my-2">
+              <div class="text-muted small uppercase fw-bold" style="font-size: 0.7rem;">Live Elapsed Time</div>
+              <div id="timerDisplay-${st.id}" class="font-display fs-2 fw-black text-warning font-mono my-1">${elapsedStr}</div>
+              
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-dark text-muted small">
+                <span>Start Time: <strong class="text-white">${startStr}</strong></span>
+                <span>Calculated: <strong id="timerPrice-${st.id}" class="text-success font-display fs-6">${estPriceStr}</strong></span>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+              ${!isRunning ? `
+                <button onclick="startTimer('${st.id}')" class="btn btn-success btn-sm w-100 py-2 fw-bold">
+                  <i class="bi bi-play-fill me-1"></i> START TIMER
+                </button>
+              ` : `
+                <button onclick="stopTimer('${st.id}')" class="btn btn-warning btn-sm flex-fill py-2 fw-bold text-dark">
+                  <i class="bi bi-stop-fill me-1"></i> STOP TIMER & BILL
+                </button>
+                <button onclick="resetTimer('${st.id}')" class="btn btn-outline-danger btn-sm py-2 px-3 fw-bold">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    // -------------------------------------------------------------
     // 4. RENDERING DASHBOARD & WIDGETS
     // -------------------------------------------------------------
     function renderAll() {
+      renderLiveTimers();
       renderShiftSettlement();
       renderLedger();
       renderOperatingMetrics();
