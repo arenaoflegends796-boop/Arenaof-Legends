@@ -628,18 +628,35 @@
       const durationMins = Math.max(1, Math.ceil(elapsedMs / 60000));
       const totalPrice = Math.round(durationMins * stDef.ratePerMin * 100) / 100;
 
-      // Auto populate entry form for quick adding!
-      document.getElementById('inputStation').value = stationId;
-      document.getElementById('inputStart').value = timer.startTimeStr;
-      document.getElementById('inputEnd').value = endTimeStr;
+      const playerNameInput = document.getElementById('inputCustomer')?.value.trim();
+      const playerName = playerNameInput || 'Walk-in Player';
+      const paymentMode = document.getElementById('inputPayment')?.value || 'UPI';
 
+      // Automatically add session record directly to Admin Session Ledger!
+      const newSession = {
+        id: 'ADM-' + Date.now(),
+        stationId: stationId,
+        stationName: stDef ? stDef.name : stationId,
+        category: stDef ? stDef.category : 'General',
+        playerName: playerName,
+        startTimeStr: timer.startTimeStr,
+        endTimeStr: endTimeStr,
+        durationMins: durationMins,
+        ratePerMin: stDef ? stDef.ratePerMin : 4.00,
+        totalPrice: totalPrice,
+        paymentMode: paymentMode,
+        timestamp: Date.now()
+      };
+
+      sessions.unshift(newSession);
+
+      // Reset timer state & sync public slots
       delete liveTimers[stationId];
       saveTimersState();
       syncTimerToPublicSlots(stationId, 'stop');
-      renderLiveTimers();
 
-      // Highlight form
-      document.getElementById('adminForm').scrollIntoView({ behavior: 'smooth' });
+      // Save state to localStorage and re-render entire ledger & widgets
+      saveState();
     }
 
     function resetTimer(stationId) {
