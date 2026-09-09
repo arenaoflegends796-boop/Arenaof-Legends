@@ -376,16 +376,21 @@ export function BookingSection() {
                           type="button"
                           disabled={blocked}
                           onClick={() => setSlot(s)}
+                          title={blocked ? "Slot currently booked or Live in-use" : `Select ${s}`}
                           className={`relative rounded-lg border px-3 py-1.5 text-xs font-bold transition-all ${
                             blocked
-                              ? "border-arena-crimson/30 bg-arena-crimson/10 text-arena-crimson line-through cursor-not-allowed"
+                              ? "border-arena-crimson/50 bg-arena-crimson/20 text-arena-crimson opacity-80 cursor-not-allowed"
                               : slot === s
                               ? "border-arena-gold bg-arena-gold/20 text-arena-gold shadow-[var(--shadow-gold)] ring-1 ring-arena-gold"
                               : "border-arena-gold/20 text-muted-foreground hover:border-arena-gold/50"
                           }`}
                         >
                           {s}
-                          {isPeak && !blocked && <span className="ml-1 text-[9px] font-black text-arena-gold">⚡</span>}
+                          {blocked ? (
+                            <span className="ml-1 text-[9px] font-black uppercase text-arena-crimson"> (LIVE IN USE)</span>
+                          ) : isPeak ? (
+                            <span className="ml-1 text-[9px] font-black text-arena-gold">⚡</span>
+                          ) : null}
                         </button>
                       );
                     })}

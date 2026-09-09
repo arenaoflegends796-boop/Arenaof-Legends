@@ -573,6 +573,37 @@
       localStorage.setItem(TIMERS_STORAGE_KEY, JSON.stringify(liveTimers));
     }
 
+    function syncTimerToPublicSlots(stationId, action, startTimeStr) {
+      try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const stDef = STATIONS_DEF.find(x => x.id === stationId);
+        const zoneId = stDef ? stDef.zoneId : 'all';
+        const blockId = `TIMER-BLK-${stationId}`;
+
+        let currentBlocks = JSON.parse(localStorage.getItem('aol_blocked_slots') || '[]');
+
+        if (action === 'start') {
+          // Add dynamic block entry for today starting from startTimeStr to 23:59
+          currentBlocks = currentBlocks.filter(b => b.id !== blockId);
+          currentBlocks.push({
+            id: blockId,
+            date: todayStr,
+            startTime: startTimeStr,
+            endTime: '23:59',
+            zoneId: zoneId,
+            reason: `⚡ LIVE IN USE (${stDef ? stDef.name : stationId})`
+          });
+        } else if (action === 'stop') {
+          // Remove dynamic block entry
+          currentBlocks = currentBlocks.filter(b => b.id !== blockId);
+        }
+
+        localStorage.setItem('aol_blocked_slots', JSON.stringify(currentBlocks));
+      } catch (e) {
+        console.error("Error syncing timer block to public slots:", e);
+      }
+    }
+
     function startTimer(stationId) {
       const now = Date.now();
       const startTimeStr = new Date(now).toTimeString().substring(0, 5);
@@ -582,6 +613,7 @@
         status: 'running'
       };
       saveTimersState();
+      syncTimerToPublicSlots(stationId, 'start', startTimeStr);
       renderLiveTimers();
     }
 
@@ -603,6 +635,7 @@
 
       delete liveTimers[stationId];
       saveTimersState();
+      syncTimerToPublicSlots(stationId, 'stop');
       renderLiveTimers();
 
       // Highlight form
@@ -613,6 +646,7 @@
       if (confirm(`Reset active timer for ${stationId}?`)) {
         delete liveTimers[stationId];
         saveTimersState();
+        syncTimerToPublicSlots(stationId, 'stop');
         renderLiveTimers();
       }
     }
