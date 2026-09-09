@@ -362,5 +362,5 @@ export function formatDuration(mins: number) {
   return `${m} min`;
 }
 
-export const PHONE = "+917483992257";
-export const WHATSAPP = "https://wa.me/917483992257";
+export const PHONE = "+917349077827";
+export const WHATSAPP = "https://wa.me/917349077827";
