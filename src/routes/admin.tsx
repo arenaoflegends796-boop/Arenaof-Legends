@@ -174,6 +174,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [walkinPhone, setWalkinPhone] = useState("");
   const [walkinZone, setWalkinZone] = useState<ZoneId>("ps5");
   const [walkinMins, setWalkinMins] = useState(60);
+  const [stationCustomerNames, setStationCustomerNames] = useState<Record<string, string>>({});
 
   // Revenue analytics computations
   const totalRevenue = bookings.reduce((sum, b) => (b.status === "completed" || b.status === "confirmed" ? sum + b.total : sum), 0);
@@ -946,6 +947,27 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         </div>
                       )}
 
+                      {!isUse && (
+                        <div className="mt-3">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                            <span>Customer Name</span>
+                            <span className="text-[9px] font-normal text-muted-foreground">(Optional)</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Rahul Sharma"
+                            value={stationCustomerNames[st.id] || ""}
+                            onChange={(e) =>
+                              setStationCustomerNames((prev) => ({
+                                ...prev,
+                                [st.id]: e.target.value,
+                              }))
+                            }
+                            className="mt-1 w-full rounded-lg border border-arena-gold/20 bg-accent/30 px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-arena-gold"
+                          />
+                        </div>
+                      )}
+
                       <div className="mt-5 flex gap-2 pt-2 border-t border-arena-gold/15">
                         <button
                           onClick={() => updateStationStatus(st.id, "available")}
@@ -956,7 +978,11 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           Available
                         </button>
                         <button
-                          onClick={() => updateStationStatus(st.id, "in_use", "Walk-in Player")}
+                          onClick={() => {
+                            const name = stationCustomerNames[st.id]?.trim() || "Walk-in Player";
+                            updateStationStatus(st.id, "in_use", name);
+                            setStationCustomerNames((prev) => ({ ...prev, [st.id]: "" }));
+                          }}
                           className={`flex-1 rounded-lg py-1.5 text-xs font-bold ${
                             st.status === "in_use" ? "bg-arena-green text-arena-dark font-extrabold" : "border border-arena-green/30 text-arena-green"
                           }`}

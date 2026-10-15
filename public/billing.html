@@ -607,11 +607,83 @@
     // -------------------------------------------------------------
     // LIVE TIMER & STOPWATCH ENGINE FOR ALL TABLES
     // -------------------------------------------------------------
+    const timerCustomerDrafts = {};
+    const timerPaymentDrafts = {};
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function handleTimerCustomerInput(stationId, value) {
+      timerCustomerDrafts[stationId] = value;
+      if (liveTimers[stationId] && liveTimers[stationId].status === 'running') {
+        liveTimers[stationId].customerName = value.trim();
+        saveTimersState();
+        syncTimerToPublicSlots(stationId, 'update', liveTimers[stationId].startTimeStr, value.trim());
+        syncTimerToArenaStations(stationId, 'start', liveTimers[stationId].startTimeStr, value.trim());
+
+        const badge = document.getElementById(`timerPlayerBadge-${stationId}`);
+        if (badge) {
+          if (value.trim()) {
+            badge.innerHTML = `👤 Player: <span class="text-white">${escapeHtml(value.trim())}</span>`;
+            badge.className = 'mt-2 pt-1 border-top border-dark text-warning small fw-bold text-truncate';
+          } else {
+            badge.innerHTML = `👤 Player: <span class="text-white">Walk-in Player</span>`;
+            badge.className = 'mt-2 pt-1 border-top border-dark text-muted small fw-bold text-truncate';
+          }
+        }
+      }
+    }
+
     function saveTimersState() {
       localStorage.setItem(TIMERS_STORAGE_KEY, JSON.stringify(liveTimers));
     }
 
-    function syncTimerToPublicSlots(stationId, action, startTimeStr) {
+    function syncTimerToArenaStations(stationId, action, startTimeStr, customerName) {
+      try {
+        const stationMap = {
+          'PS5-VIP-1': 'ST-PS5-1',
+          'PS5-VIP-2': 'ST-PS5-2',
+          'SNOOKER-1': 'ST-SNK-1',
+          'SNOOKER-2': 'ST-SNK-2',
+          'SNOOKER-3': 'ST-SNK-3',
+          'FRENCH-1': 'ST-FRN-1',
+        };
+        const targetId = stationMap[stationId] || stationId;
+        let arenaStations = JSON.parse(localStorage.getItem('aol_stations') || '[]');
+        if (!arenaStations || !arenaStations.length) return;
+
+        arenaStations = arenaStations.map(s => {
+          if (s.id === targetId) {
+            if (action === 'start') {
+              return {
+                ...s,
+                status: 'in_use',
+                assignedCustomer: customerName || 'Walk-in Player',
+                startTime: startTimeStr,
+                currentSessionMinutes: 0
+              };
+            } else if (action === 'stop') {
+              const { assignedCustomer, startTime, currentSessionMinutes, ...rest } = s;
+              return { ...rest, status: 'available' };
+            }
+          }
+          return s;
+        });
+
+        localStorage.setItem('aol_stations', JSON.stringify(arenaStations));
+      } catch (e) {
+        console.warn("Could not sync to aol_stations:", e);
+      }
+    }
+
+    function syncTimerToPublicSlots(stationId, action, startTimeStr, customerName) {
       try {
         const todayStr = new Date().toISOString().split('T')[0];
         const stDef = STATIONS_DEF.find(x => x.id === stationId);
@@ -620,8 +692,8 @@
 
         let currentBlocks = JSON.parse(localStorage.getItem('aol_blocked_slots') || '[]');
 
-        if (action === 'start') {
-          // Add dynamic block entry for today starting from startTimeStr to 23:59
+        if (action === 'start' || action === 'update') {
+          const custSuffix = customerName ? ` — ${customerName}` : '';
           currentBlocks = currentBlocks.filter(b => b.id !== blockId);
           currentBlocks.push({
             id: blockId,
@@ -629,10 +701,9 @@
             startTime: startTimeStr,
             endTime: '23:59',
             zoneId: zoneId,
-            reason: `⚡ LIVE IN USE (${stDef ? stDef.name : stationId})`
+            reason: `⚡ LIVE IN USE (${stDef ? stDef.name : stationId}${custSuffix})`
           });
         } else if (action === 'stop') {
-          // Remove dynamic block entry
           currentBlocks = currentBlocks.filter(b => b.id !== blockId);
         }
 
@@ -645,13 +716,18 @@
     function startTimer(stationId) {
       const now = Date.now();
       const startTimeStr = new Date(now).toTimeString().substring(0, 5);
+      const custInput = document.getElementById(`timerCustomer-${stationId}`);
+      const custName = (custInput ? custInput.value.trim() : '') || timerCustomerDrafts[stationId] || '';
+
       liveTimers[stationId] = {
         startTimeMs: now,
         startTimeStr: startTimeStr,
+        customerName: custName,
         status: 'running'
       };
       saveTimersState();
-      syncTimerToPublicSlots(stationId, 'start', startTimeStr);
+      syncTimerToPublicSlots(stationId, 'start', startTimeStr, custName);
+      syncTimerToArenaStations(stationId, 'start', startTimeStr, custName);
       renderLiveTimers();
     }
 
@@ -666,10 +742,10 @@
       const durationMins = Math.max(1, Math.ceil(elapsedMs / 60000));
       const totalPrice = Math.round(durationMins * stDef.ratePerMin * 100) / 100;
 
-      const playerNameInput = document.getElementById('inputCustomer')?.value.trim();
-      const playerName = playerNameInput || 'Walk-in Player';
+      const timerCustInput = document.getElementById(`timerCustomer-${stationId}`)?.value.trim();
+      const playerName = timerCustInput || timer.customerName || timerCustomerDrafts[stationId] || document.getElementById('inputCustomer')?.value.trim() || 'Walk-in Player';
       const timerPaySelect = document.getElementById(`timerPayment-${stationId}`);
-      const paymentMode = timerPaySelect ? timerPaySelect.value : (document.getElementById('inputPayment')?.value || 'UPI');
+      const paymentMode = timerPaySelect ? timerPaySelect.value : (timerPaymentDrafts[stationId] || document.getElementById('inputPayment')?.value || 'UPI');
 
       // Automatically add session record directly to Admin Session Ledger!
       const newSession = {
@@ -689,10 +765,13 @@
 
       sessions.unshift(newSession);
 
-      // Reset timer state & sync public slots
+      // Clean up drafts & timer state
+      delete timerCustomerDrafts[stationId];
+      delete timerPaymentDrafts[stationId];
       delete liveTimers[stationId];
       saveTimersState();
       syncTimerToPublicSlots(stationId, 'stop');
+      syncTimerToArenaStations(stationId, 'stop');
 
       // Save state to localStorage and re-render entire ledger & widgets
       saveState();
@@ -705,9 +784,12 @@
 
     function resetTimer(stationId) {
       if (confirm(`Reset active timer for ${stationId}?`)) {
+        delete timerCustomerDrafts[stationId];
+        delete timerPaymentDrafts[stationId];
         delete liveTimers[stationId];
         saveTimersState();
         syncTimerToPublicSlots(stationId, 'stop');
+        syncTimerToArenaStations(stationId, 'stop');
         renderLiveTimers();
       }
     }
@@ -745,6 +827,11 @@
       STATIONS_DEF.forEach(st => {
         const timer = liveTimers[st.id];
         const isRunning = timer && timer.status === 'running';
+        const currentCustomer = (isRunning && timer.customerName !== undefined)
+          ? timer.customerName
+          : (timerCustomerDrafts[st.id] !== undefined ? timerCustomerDrafts[st.id] : '');
+        const currentCustomerEscaped = escapeHtml(currentCustomer);
+        const currentPayment = timerPaymentDrafts[st.id] || 'UPI';
 
         let elapsedStr = '00:00:00';
         let estPriceStr = '₹0.00';
@@ -786,14 +873,38 @@
                 <span>Start Time: <strong class="text-white">${startStr}</strong></span>
                 <span>Calculated: <strong id="timerPrice-${st.id}" class="text-success font-display fs-6">${estPriceStr}</strong></span>
               </div>
+
+              ${isRunning ? `
+                <div id="timerPlayerBadge-${st.id}" class="mt-2 pt-1 border-top border-dark ${currentCustomer ? 'text-warning' : 'text-muted'} small fw-bold text-truncate">
+                  👤 Player: <span class="text-white">${currentCustomer ? currentCustomerEscaped : 'Walk-in Player'}</span>
+                </div>
+              ` : ''}
             </div>
 
+            <!-- Customer / Player Name input -->
+            <div class="my-2">
+              <label class="form-label text-muted small mb-1 fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-fill me-1 text-gold"></i> Customer / Player Name:</span>
+                ${isRunning && currentCustomer ? `<span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.65rem;">Active</span>` : `<span class="text-muted" style="font-size: 0.7rem;">(Optional)</span>`}
+              </label>
+              <input
+                type="text"
+                id="timerCustomer-${st.id}"
+                class="form-control form-control-sm text-white bg-dark border-secondary"
+                placeholder="e.g. Rahul Sharma (or Walk-in)"
+                value="${currentCustomerEscaped}"
+                oninput="handleTimerCustomerInput('${st.id}', this.value)"
+                style="min-height: 40px;"
+              />
+            </div>
+
+            <!-- Session Payment Mode selector -->
             <div class="my-2">
               <label class="form-label text-muted small mb-1 fw-bold">Session Payment Mode:</label>
-              <select id="timerPayment-${st.id}" class="form-select form-select-sm fw-bold bg-dark text-white border-secondary" style="min-height: 40px;">
-                <option value="UPI" selected>📱 Online / PhonePe UPI / QR</option>
-                <option value="CASH">💵 Cash</option>
-                <option value="PENDING">⏳ Pending / Unpaid</option>
+              <select id="timerPayment-${st.id}" onchange="timerPaymentDrafts['${st.id}'] = this.value" class="form-select form-select-sm fw-bold bg-dark text-white border-secondary" style="min-height: 40px;">
+                <option value="UPI" ${currentPayment === 'UPI' ? 'selected' : ''}>📱 Online / PhonePe UPI / QR</option>
+                <option value="CASH" ${currentPayment === 'CASH' ? 'selected' : ''}>💵 Cash</option>
+                <option value="PENDING" ${currentPayment === 'PENDING' ? 'selected' : ''}>⏳ Pending / Unpaid</option>
               </select>
             </div>
 
